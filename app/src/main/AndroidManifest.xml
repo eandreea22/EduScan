@@ -12,6 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EduScan"
         tools:targetApi="31">
+        <activity android:name=".PopUpNewAccount"
+            android:theme="@style/Theme.EduScan.CustomTheme" />
         <activity
             android:name=".SingUpActivity"
             android:exported="true" />

@@ -6,4 +6,9 @@
     </style>
 
     <style name="Theme.EduScan" parent="Base.Theme.EduScan" />
+
+    <style name="Theme.EduScan.CustomTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+    </style>
 </resources>
