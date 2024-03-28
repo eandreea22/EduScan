@@ -32,7 +32,7 @@
 
         <LinearLayout
             android:layout_width="390dp"
-            android:layout_height="360dp"
+            android:layout_height="379dp"
             android:layout_gravity="center"
             android:background="@drawable/border"
             android:backgroundTint="#72EDECEC"
@@ -52,7 +52,7 @@
                 android:textSize="20sp" />
 
             <EditText
-                android:id="@+id/loginUpEmail"
+                android:id="@+id/loginUsername"
                 android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -61,8 +61,8 @@
                 android:background="@drawable/border"
                 android:ems="10"
                 android:fontFamily="sans-serif-medium"
-                android:hint=" email"
-                android:inputType="textEmailAddress"
+                android:hint="username"
+                android:inputType="text"
                 android:minHeight="48dp"
                 android:padding="10dp"
                 android:textSize="16sp" />
@@ -86,10 +86,10 @@
             <Button
                 android:id="@+id/buttonLogin"
                 android:layout_width="230dp"
-                android:layout_height="61dp"
+                android:layout_height="64dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="10dp"
                 android:backgroundTint="#050505"
                 android:fontFamily="sans-serif-black"
                 android:text="Login"
@@ -97,6 +97,18 @@
                 android:textColorHighlight="#000000"
                 android:textColorLink="#000000"
                 android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textLoginMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="password does not match!"
+                android:textAlignment="center"
+                android:textColor="#80D50000"
+                android:textSize="15sp"
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/textView9"

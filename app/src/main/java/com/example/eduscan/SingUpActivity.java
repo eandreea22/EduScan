@@ -10,7 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
+
+
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,8 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.sql.SQLOutput;
-import java.util.regex.Pattern;
+
 
 
 public class SingUpActivity extends AppCompatActivity {
@@ -30,6 +30,7 @@ public class SingUpActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference reference;
     TextView textSignUpMessage;
+    TextView loginRedirect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,78 +46,94 @@ public class SingUpActivity extends AppCompatActivity {
 
         buttonSignUp = findViewById(R.id.buttonSignUp);
 
+        loginRedirect = findViewById(R.id.loginRedirect);
+
         buttonSignUp.setOnClickListener(new View.OnClickListener() {
+
 
             @Override
             public void onClick(View view) {
 
 
-                startActivity(new Intent(SingUpActivity.this, PopUpNewAccount.class));
+//              startActivity(new Intent(SingUpActivity.this, PopUpNewAccount.class));
 
-//                database = FirebaseDatabase.getInstance();
-//                reference = database.getReference("users");
-//
-//                String name = signUpName.getText().toString();
-//                String username = signUpUsername.getText().toString();
-//                String email = signUpEmail.getText().toString();
-//                String password = signUpPassword.getText().toString();
-//
-//                if (password.isEmpty()){
-//                    textSignUpMessage.setText("Please enter a password!");
-//                    textSignUpMessage.setVisibility(View.VISIBLE);
-//
-//                }else if(name.isEmpty()){
-//                    textSignUpMessage.setText("Please enter your name!");
-//                    textSignUpMessage.setVisibility(View.VISIBLE);
-//
-//                }else if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-//
-//                    textSignUpMessage.setText("Please enter a valid email!");
-//                    textSignUpMessage.setVisibility(View.VISIBLE);
-//
-//                } else {
-//
-//                    // verif if username exists
-//                    DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference("users");
-//                    Query checkUsername = reference1.orderByChild("username").equalTo(username);
-//
-//                    checkUsername.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-//
-//                            if (snapshot.exists()) {
-//
-//                                textSignUpMessage.setText("Username already exists!");
-//                                textSignUpMessage.setVisibility(View.VISIBLE);
-//
-//                            } else {
-//                                // add user
-//                                User user = new User();
-//                                user.setUsername(username);
-//                                user.setName(name);
-//                                user.setEmail(email);
-//                                user.setPassword(password);
-//
-//                                reference.child(username).setValue(user);
-//
+                database = FirebaseDatabase.getInstance();
+                reference = database.getReference("users");
+
+                String name = signUpName.getText().toString();
+                String username = signUpUsername.getText().toString();
+                String email = signUpEmail.getText().toString();
+                String password = signUpPassword.getText().toString();
+
+                if (password.isEmpty()){
+                    textSignUpMessage.setText("Please enter a password!");
+                    textSignUpMessage.setVisibility(View.VISIBLE);
+
+                }else if(name.isEmpty()){
+                    textSignUpMessage.setText("Please enter your name!");
+                    textSignUpMessage.setVisibility(View.VISIBLE);
+
+                }else if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+
+                    textSignUpMessage.setText("Please enter a valid email!");
+                    textSignUpMessage.setVisibility(View.VISIBLE);
+
+                } else {
+
+                    if (username.isEmpty()){
+                        textSignUpMessage.setText("Please enter a username!");
+                        textSignUpMessage.setVisibility(View.VISIBLE);
+                    }
+
+                    // verif if username exists
+                    DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference("users");
+                    Query checkUsername = reference1.orderByChild("username").equalTo(username);
+
+                    checkUsername.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            if (snapshot.exists()) {
+
+                                textSignUpMessage.setText("Username already exists!");
+                                textSignUpMessage.setVisibility(View.VISIBLE);
+
+                            } else {
+
+                                // add user
+                                User user = new User();
+                                user.setUsername(username);
+                                user.setName(name);
+                                user.setEmail(email);
+                                user.setPassword(password);
+
+                                DatabaseConnection.getInstance().addUser(user);
+
 //                                startActivity(new Intent(SingUpActivity.this, PopUpNewAccount.class));
-//
-//
-//
-////                                Intent intent = new Intent(SingUpActivity.this, LoginActivity.class);
-////                                startActivity(intent);
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onCancelled(@NonNull DatabaseError error) {
-//                            System.out.println("The read failed: " + error.getCode());
-//                        }
-//                    });
-//
-//                }
 
 
+                                Intent intent = new Intent(SingUpActivity.this, LoginActivity.class);
+                                startActivity(intent);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            System.out.println("The read failed: " + error.getCode());
+                        }
+                    });
+
+                }
+
+
+            }
+        });
+
+        loginRedirect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(SingUpActivity.this, LoginActivity.class);
+                startActivity(intent);
             }
         });
 

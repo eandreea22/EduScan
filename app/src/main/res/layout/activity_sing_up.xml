@@ -141,9 +141,10 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textView9"
+                android:id="@+id/loginRedirect"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clickable="true"
                 android:fontFamily="sans-serif-medium"
                 android:text="Already have an account? Sign in "
                 android:textAlignment="center"
