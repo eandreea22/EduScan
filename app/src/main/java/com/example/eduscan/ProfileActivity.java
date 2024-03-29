@@ -17,7 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.eduscan.databinding.ActivityProfileBinding;
+
 
 public class ProfileActivity extends AppCompatActivity {
 
