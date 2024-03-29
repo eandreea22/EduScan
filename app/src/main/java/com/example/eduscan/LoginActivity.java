@@ -2,6 +2,7 @@ package com.example.eduscan;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -63,48 +64,38 @@ public class LoginActivity extends AppCompatActivity {
                 }else {
 
                     //check user exist
+                    LiveData<Boolean> usernameExists = DatabaseConnection.getInstance().checkUsername(username);
 
-                    Query checkUsername = reference.orderByChild("username").equalTo(username);
+                    usernameExists.observe(LoginActivity.this, result -> {
 
-                    checkUsername.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (result){
 
-                            if (!snapshot.exists()){
-                                textLoginMessage.setText("The username doesn't exist!");
-                                textLoginMessage.setVisibility(View.VISIBLE);
+                            LiveData<Boolean> correctPassword = DatabaseConnection.getInstance().checkPassword(username, password);
 
-                            }else{
-                                DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference("users");
-                                Query checkPassword = reference1.orderByChild("password").equalTo(password);
+                            correctPassword.observe(LoginActivity.this, result1 -> {
 
-                                checkPassword.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        if (snapshot.exists()){
+                                if (result1){
 
-                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                            startActivity(intent);
+                                    //save user
+                                    DatabaseConnection.getInstance().saveUser(username);
 
-                                        }else {
-                                            textLoginMessage.setText("The password is incorrect!");
-                                            textLoginMessage.setVisibility(View.VISIBLE);
-                                        }
-                                    }
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-                                        System.out.println("The read failed: " + error.getCode());
-                                    }
-                                });
-                            }
-                        }
+                                }else {
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            System.out.println("The read failed: " + error.getCode());
+                                    textLoginMessage.setText("The password is incorrect!");
+                                    textLoginMessage.setVisibility(View.VISIBLE);
+                                }
+
+                            });
+
+                        }else {
+                            textLoginMessage.setText("The username doesn't exist!");
+                            textLoginMessage.setVisibility(View.VISIBLE);
                         }
                     });
+
 
                 }
             }

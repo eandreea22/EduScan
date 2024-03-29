@@ -2,6 +2,8 @@ package com.example.eduscan;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,8 +29,6 @@ public class SingUpActivity extends AppCompatActivity {
 
     EditText signUpName, signUpUsername, signUpEmail, signUpPassword;
     Button buttonSignUp;
-    FirebaseDatabase database;
-    DatabaseReference reference;
     TextView textSignUpMessage;
     TextView loginRedirect;
 
@@ -57,15 +57,18 @@ public class SingUpActivity extends AppCompatActivity {
 
 //              startActivity(new Intent(SingUpActivity.this, PopUpNewAccount.class));
 
-                database = FirebaseDatabase.getInstance();
-                reference = database.getReference("users");
 
                 String name = signUpName.getText().toString();
                 String username = signUpUsername.getText().toString();
                 String email = signUpEmail.getText().toString();
                 String password = signUpPassword.getText().toString();
 
-                if (password.isEmpty()){
+
+                if (username.isEmpty()){
+                    textSignUpMessage.setText("Please enter a username!");
+                    textSignUpMessage.setVisibility(View.VISIBLE);
+
+                }else if (password.isEmpty()){
                     textSignUpMessage.setText("Please enter a password!");
                     textSignUpMessage.setVisibility(View.VISIBLE);
 
@@ -80,48 +83,34 @@ public class SingUpActivity extends AppCompatActivity {
 
                 } else {
 
-                    if (username.isEmpty()){
-                        textSignUpMessage.setText("Please enter a username!");
-                        textSignUpMessage.setVisibility(View.VISIBLE);
-                    }
-
                     // verif if username exists
-                    DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference("users");
-                    Query checkUsername = reference1.orderByChild("username").equalTo(username);
+                    LiveData<Boolean> usernameExists = DatabaseConnection.getInstance().checkUsername(username);
 
-                    checkUsername.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    usernameExists.observe(SingUpActivity.this, result -> {
 
-                            if (snapshot.exists()) {
+                        if (result){
+                            textSignUpMessage.setText("Username already exists!");
+                            textSignUpMessage.setVisibility(View.VISIBLE);
+                        }else {
 
-                                textSignUpMessage.setText("Username already exists!");
-                                textSignUpMessage.setVisibility(View.VISIBLE);
+                            // add user
+                            User user = new User();
+                            user.setUsername(username);
+                            user.setName(name);
+                            user.setEmail(email);
+                            user.setPassword(password);
 
-                            } else {
-
-                                // add user
-                                User user = new User();
-                                user.setUsername(username);
-                                user.setName(name);
-                                user.setEmail(email);
-                                user.setPassword(password);
-
-                                DatabaseConnection.getInstance().addUser(user);
+                            DatabaseConnection.getInstance().addUser(user);
 
 //                                startActivity(new Intent(SingUpActivity.this, PopUpNewAccount.class));
 
 
-                                Intent intent = new Intent(SingUpActivity.this, LoginActivity.class);
-                                startActivity(intent);
-                            }
+                            Intent intent = new Intent(SingUpActivity.this, LoginActivity.class);
+                            startActivity(intent);
                         }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            System.out.println("The read failed: " + error.getCode());
-                        }
                     });
+
 
                 }
 

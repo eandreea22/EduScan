@@ -157,15 +157,16 @@
                 android:textSize="16sp" />
 
 
-
             <TextView
-                android:id="@+id/textSignUpMessage"
+                android:id="@+id/textProfileMessage"
                 android:layout_width="339dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="password does not match!"
                 android:textAlignment="center"
-                android:textColor="#80D50000"
+                android:textColor="#868686"
                 android:textSize="15sp"
                 android:visibility="invisible" />
 
