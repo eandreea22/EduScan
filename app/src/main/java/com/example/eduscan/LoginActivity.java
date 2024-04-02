@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 public class LoginActivity extends AppCompatActivity {
 
     EditText loginUsername, loginPassword;
-    TextView textLoginMessage;
     Button buttonLogin;
     Button buttonCreateAccount;
     FirebaseDatabase database;
@@ -31,8 +31,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        textLoginMessage = findViewById(R.id.textLoginMessage);
 
         loginUsername = findViewById(R.id.loginUsername);
         loginPassword = findViewById(R.id.loginPassword);
@@ -53,13 +51,12 @@ public class LoginActivity extends AppCompatActivity {
                 String password = loginPassword.getText().toString();
 
                 if (username.isEmpty()) {
-                    textLoginMessage.setText("Please enter a username!");
-                    textLoginMessage.setVisibility(View.VISIBLE);
+                    Toast.makeText(LoginActivity.this, "Please enter a username!", Toast.LENGTH_SHORT).show();
 
                 }
                  else if (password.isEmpty()){
-                    textLoginMessage.setText("Please enter a password!");
-                    textLoginMessage.setVisibility(View.VISIBLE);
+                    Toast.makeText(LoginActivity.this, "Please enter a password!", Toast.LENGTH_SHORT).show();
+
 
                 }else {
 
@@ -83,16 +80,15 @@ public class LoginActivity extends AppCompatActivity {
                                     startActivity(intent);
 
                                 }else {
+                                    Toast.makeText(LoginActivity.this, "The password is incorrect!", Toast.LENGTH_SHORT).show();
 
-                                    textLoginMessage.setText("The password is incorrect!");
-                                    textLoginMessage.setVisibility(View.VISIBLE);
                                 }
 
                             });
 
                         }else {
-                            textLoginMessage.setText("The username doesn't exist!");
-                            textLoginMessage.setVisibility(View.VISIBLE);
+                            Toast.makeText(LoginActivity.this, "The username doesn't exist!", Toast.LENGTH_SHORT).show();
+
                         }
                     });
 

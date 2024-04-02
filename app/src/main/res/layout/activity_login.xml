@@ -99,18 +99,6 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textLoginMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="password does not match!"
-                android:textAlignment="center"
-                android:textColor="#80D50000"
-                android:textSize="15sp"
-                android:visibility="invisible" />
-
-            <TextView
                 android:id="@+id/textView9"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

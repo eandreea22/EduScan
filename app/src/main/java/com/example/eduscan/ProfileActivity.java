@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -23,7 +24,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     Button profileButtonBack;
     Button profileButtonEdit;
-    TextView textProfileMessage;
     AutoCompleteTextView profileCompleteName;
     AutoCompleteTextView profileCompleteUsername;
     AutoCompleteTextView profileCompleteEmail;
@@ -33,7 +33,6 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        textProfileMessage = findViewById(R.id.textProfileMessage);
 
         profileButtonBack = findViewById(R.id.profileButtonBack);
         profileButtonEdit = findViewById(R.id.profileButtonEdit);
@@ -62,24 +61,24 @@ public class ProfileActivity extends AppCompatActivity {
                         public void onUpdateSuccess() {
                             runOnUiThread(() -> {
                                 profileCompleteName.setText(newName);
-                                textProfileMessage.setText("Updated successfully!");
-                                textProfileMessage.setVisibility(View.VISIBLE);
+                                Toast.makeText(ProfileActivity.this, "Updated successfully!", Toast.LENGTH_SHORT).show();
+
                             });
                         }
 
                         @Override
                         public void onUpdateFailure(String errorMessage) {
                             runOnUiThread(() -> {
-                                textProfileMessage.setText("Failed to update name");
-                                textProfileMessage.setVisibility(View.VISIBLE);
+                                Toast.makeText(ProfileActivity.this, "Failed to update name", Toast.LENGTH_SHORT).show();
+
                             });
                         }
                     });
 
 
                 }else {
-                    textProfileMessage.setText("Not a valid name!");
-                    textProfileMessage.setVisibility(View.VISIBLE);
+                    Toast.makeText(ProfileActivity.this, "Not a valid name!", Toast.LENGTH_SHORT).show();
+
                 }
 
                 String newEmail = profileCompleteEmail.getText().toString().trim();
@@ -90,24 +89,24 @@ public class ProfileActivity extends AppCompatActivity {
                         public void onUpdateSuccess() {
                             runOnUiThread(() -> {
                                 profileCompleteEmail.setText(newEmail);
-                                textProfileMessage.setText("Updated successfully!");
-                                textProfileMessage.setVisibility(View.VISIBLE);
+                                Toast.makeText(ProfileActivity.this, "Updated successfully!", Toast.LENGTH_SHORT).show();
+
                             });
                         }
 
                         @Override
                         public void onUpdateFailure(String errorMessage) {
                             runOnUiThread(() -> {
-                                textProfileMessage.setText("Failed to update email");
-                                textProfileMessage.setVisibility(View.VISIBLE);
+                                Toast.makeText(ProfileActivity.this, "Failed to update email", Toast.LENGTH_SHORT).show();
+
                             });
                         }
                     });
 
 
                 }else {
-                    textProfileMessage.setText("Not a valid email!");
-                    textProfileMessage.setVisibility(View.VISIBLE);
+                    Toast.makeText(ProfileActivity.this, "Not a valid email!", Toast.LENGTH_SHORT).show();
+
                 }
 
                 String newUsername = profileCompleteUsername.getText().toString().trim();
@@ -118,23 +117,23 @@ public class ProfileActivity extends AppCompatActivity {
                         public void onUpdateSuccess() {
                             runOnUiThread(() -> {
                                 profileCompleteUsername.setText(newUsername);
-                                textProfileMessage.setText("Updated successfully!");
-                                textProfileMessage.setVisibility(View.VISIBLE);
+                                Toast.makeText(ProfileActivity.this, "Updated successfully!", Toast.LENGTH_SHORT).show();
+
                             });
                         }
 
                         @Override
                         public void onUpdateFailure(String errorMessage) {
                             runOnUiThread(() -> {
-                                textProfileMessage.setText("Failed to update username");
-                                textProfileMessage.setVisibility(View.VISIBLE);
+                                Toast.makeText(ProfileActivity.this, "Failed to update username", Toast.LENGTH_SHORT).show();
+
                             });
                         }
                     });
 
                 }else {
-                    textProfileMessage.setText("Not a valid username!");
-                    textProfileMessage.setVisibility(View.VISIBLE);
+                    Toast.makeText(ProfileActivity.this, "Not a valid username!", Toast.LENGTH_SHORT).show();
+
                 }
 
             }
@@ -159,10 +158,5 @@ public class ProfileActivity extends AppCompatActivity {
         return username.toString().matches("^[a-zA-Z0-9_.]{3,16}$");
     }
 
-    private void refreshActivity() {
-        Intent intent = getIntent();
-        finish();
-        startActivity(intent);
-    }
 
 }

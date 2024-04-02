@@ -114,17 +114,6 @@
                 android:padding="10dp"
                 android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/textSignUpMessage"
-                android:layout_width="339dp"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="password does not match!"
-                android:textAlignment="center"
-                android:textColor="#80D50000"
-                android:textSize="15sp"
-                android:visibility="invisible" />
-
             <Button
                 android:id="@+id/buttonSignUp"
                 android:layout_width="194dp"

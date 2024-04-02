@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 
 import com.google.firebase.database.DataSnapshot;
@@ -29,7 +29,7 @@ public class SingUpActivity extends AppCompatActivity {
 
     EditText signUpName, signUpUsername, signUpEmail, signUpPassword;
     Button buttonSignUp;
-    TextView textSignUpMessage;
+
     TextView loginRedirect;
 
     @Override
@@ -37,7 +37,6 @@ public class SingUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sing_up);
 
-        textSignUpMessage = findViewById(R.id.textSignUpMessage);
 
         signUpName = findViewById(R.id.signUpName);
         signUpUsername = findViewById(R.id.signUpUsername);
@@ -65,21 +64,20 @@ public class SingUpActivity extends AppCompatActivity {
 
 
                 if (username.isEmpty()){
-                    textSignUpMessage.setText("Please enter a username!");
-                    textSignUpMessage.setVisibility(View.VISIBLE);
+                    Toast.makeText(SingUpActivity.this, "Please enter a username!", Toast.LENGTH_SHORT).show();
 
                 }else if (password.isEmpty()){
-                    textSignUpMessage.setText("Please enter a password!");
-                    textSignUpMessage.setVisibility(View.VISIBLE);
+                    Toast.makeText(SingUpActivity.this, "Please enter a password!", Toast.LENGTH_SHORT).show();
+
 
                 }else if(name.isEmpty()){
-                    textSignUpMessage.setText("Please enter your name!");
-                    textSignUpMessage.setVisibility(View.VISIBLE);
+                    Toast.makeText(SingUpActivity.this, "Please enter your name!", Toast.LENGTH_SHORT).show();
+
 
                 }else if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
 
-                    textSignUpMessage.setText("Please enter a valid email!");
-                    textSignUpMessage.setVisibility(View.VISIBLE);
+                    Toast.makeText(SingUpActivity.this, "Please enter a valid email!", Toast.LENGTH_SHORT).show();
+
 
                 } else {
 
@@ -89,8 +87,8 @@ public class SingUpActivity extends AppCompatActivity {
                     usernameExists.observe(SingUpActivity.this, result -> {
 
                         if (result){
-                            textSignUpMessage.setText("Username already exists!");
-                            textSignUpMessage.setVisibility(View.VISIBLE);
+                            Toast.makeText(SingUpActivity.this, "Username already exists!", Toast.LENGTH_SHORT).show();
+
                         }else {
 
                             // add user
