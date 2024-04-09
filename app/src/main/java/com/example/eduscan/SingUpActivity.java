@@ -69,7 +69,6 @@ public class SingUpActivity extends AppCompatActivity {
                 }else if (password.isEmpty()){
                     Toast.makeText(SingUpActivity.this, "Please enter a password!", Toast.LENGTH_SHORT).show();
 
-
                 }else if(name.isEmpty()){
                     Toast.makeText(SingUpActivity.this, "Please enter your name!", Toast.LENGTH_SHORT).show();
 
@@ -78,6 +77,9 @@ public class SingUpActivity extends AppCompatActivity {
 
                     Toast.makeText(SingUpActivity.this, "Please enter a valid email!", Toast.LENGTH_SHORT).show();
 
+
+                } else if (password.length()<8) {
+                    Toast.makeText(SingUpActivity.this, "The password must have at least 8 characters!", Toast.LENGTH_SHORT).show();
 
                 } else {
 

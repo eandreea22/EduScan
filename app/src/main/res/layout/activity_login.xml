@@ -52,7 +52,7 @@
                 android:textSize="20sp" />
 
             <EditText
-                android:id="@+id/loginUsername"
+                android:id="@+id/loginEmail"
                 android:layout_width="350dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -61,7 +61,7 @@
                 android:background="@drawable/border"
                 android:ems="10"
                 android:fontFamily="sans-serif-medium"
-                android:hint="username"
+                android:hint="email"
                 android:inputType="text"
                 android:minHeight="48dp"
                 android:padding="10dp"

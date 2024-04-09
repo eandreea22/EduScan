@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText loginUsername, loginPassword;
+    EditText loginEmail, loginPassword;
     Button buttonLogin;
     Button buttonCreateAccount;
     FirebaseDatabase database;
@@ -33,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        loginUsername = findViewById(R.id.loginUsername);
+        loginEmail = findViewById(R.id.loginEmail);
         loginPassword = findViewById(R.id.loginPassword);
 
         buttonLogin = findViewById(R.id.buttonLogin);
@@ -48,11 +49,11 @@ public class LoginActivity extends AppCompatActivity {
                 database = FirebaseDatabase.getInstance();
                 reference = database.getReference("users");
 
-                String username = loginUsername.getText().toString();
+                String email = loginEmail.getText().toString();
                 String password = loginPassword.getText().toString();
 
-                if (username.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Please enter a username!", Toast.LENGTH_SHORT).show();
+                if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    Toast.makeText(LoginActivity.this, "Please enter a email!", Toast.LENGTH_SHORT).show();
 
                 }
                  else if (password.isEmpty()){
@@ -61,63 +62,54 @@ public class LoginActivity extends AppCompatActivity {
 
                 }else {
 
-                    //check user exist
-                    LiveData<Boolean> usernameExists = DatabaseConnection.getInstance().checkUsername(username);
-
-//                    usernameExists.observe(LoginActivity.this, result -> {
+//                    //check user exist
+//                    LiveData<Boolean> usernameExists = DatabaseConnection.getInstance().checkUsername(username);
 //
-//                        if (result){
+//                    usernameExists.observeForever(new Observer<Boolean>() {
+//                        @Override
+//                        public void onChanged(Boolean result) {
 //
-//                            LiveData<Boolean> correctPassword = DatabaseConnection.getInstance().checkPassword(username, password);
+//                            if (result){
+//                                LiveData<Boolean> correctPassword = DatabaseConnection.getInstance().checkPassword(username, password);
 //
-//                            correctPassword.observe(LoginActivity.this, result1 -> {
+//                                correctPassword.observeForever(new Observer<Boolean>() {
+//                                    @Override
+//                                    public void onChanged(Boolean result1) {
+//                                        if (result1){
+//                                            //save user
+//                                            DatabaseConnection.getInstance().saveUser(username);
 //
-//                                if (result1){
+//                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                                            startActivity(intent);
+//                                        }else {
+//                                            Toast.makeText(LoginActivity.this, "The password is incorrect!", Toast.LENGTH_SHORT).show();
 //
-//                                    //save user
-//                                    DatabaseConnection.getInstance().saveUser(username);
-//
-//                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                                    startActivity(intent);
-//
-//                                }else {
-//                                    Toast.makeText(LoginActivity.this, "The password is incorrect!", Toast.LENGTH_SHORT).show();
-//
-//                                }
-//
-//                            });
-//
-//                        }else {
-//                            Toast.makeText(LoginActivity.this, "The username doesn't exist!", Toast.LENGTH_SHORT).show();
-//
+//                                        }
+//                                    }
+//                                });
+//                            }else {
+//                                Toast.makeText(LoginActivity.this, "The username doesn't exist!", Toast.LENGTH_SHORT).show();
+//                            }
 //                        }
 //                    });
 
-                    usernameExists.observeForever(new Observer<Boolean>() {
+                    DatabaseConnection.getInstance().saveUser(email.trim(), password, new DatabaseConnection.UserSaveListener() {
                         @Override
-                        public void onChanged(Boolean result) {
+                        public void onUserSaved(User user) {
+                            // Autentificarea și salvarea utilizatorului au reușit
+                            // Aici puteți gestiona următorul pas sau acțiune în funcție de nevoile dvs.
+                            // De exemplu, puteți redirecționa utilizatorul către activitatea principală
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            startActivity(intent);
 
-                            if (result){
-                                LiveData<Boolean> correctPassword = DatabaseConnection.getInstance().checkPassword(username, password);
+                            finish(); // Dacă doriți să închideți activitatea de login după autentificare
+                        }
 
-                                correctPassword.observeForever(new Observer<Boolean>() {
-                                    @Override
-                                    public void onChanged(Boolean result1) {
-                                        if (result1){
-                                            //save user
-                                            DatabaseConnection.getInstance().saveUser(username);
-
-                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                            startActivity(intent);
-                                        }else {
-                                            Toast.makeText(LoginActivity.this, "The password is incorrect!", Toast.LENGTH_SHORT).show();
-
-                                        }
-                                    }
-                                });
-                            }else {
-                                Toast.makeText(LoginActivity.this, "The username doesn't exist!", Toast.LENGTH_SHORT).show();
-                            }
+                        @Override
+                        public void onUserSaveFailed(String errorMessage) {
+                            // Autentificarea sau salvarea utilizatorului au eșuat
+                            // Aici puteți trata eroarea sau afișa un mesaj utilizatorului
+                            Toast.makeText(LoginActivity.this, "Authentication failed: " + errorMessage, Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -128,8 +120,6 @@ public class LoginActivity extends AppCompatActivity {
 
 
         buttonCreateAccount.setOnClickListener(new View.OnClickListener(){
-
-
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LoginActivity.this, SingUpActivity.class);

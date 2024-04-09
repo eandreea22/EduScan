@@ -50,12 +50,17 @@ dependencies {
     implementation("com.itextpdf:itext7-core:7.1.9");
 
     //
-    implementation("com.quickbirdstudios:opencv-contrib:4.5.3.0")
+    //implementation("com.quickbirdstudios:opencv-contrib:4.5.3.0")
 
     //word
     implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:8.3.0") {
         exclude(group = "commons-logging", module = "commons-logging")
     }
+
+    implementation("com.google.firebase:firebase-auth:22.3.1")
+    implementation("com.google.firebase:firebase-database:20.3.1")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")

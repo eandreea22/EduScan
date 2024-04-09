@@ -43,6 +43,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -53,12 +58,15 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class TextRecognitionActivity extends AppCompatActivity {
 
@@ -546,30 +554,90 @@ public class TextRecognitionActivity extends AppCompatActivity {
     private void saveTextAsPDF(String recognizedText, String filename) {
 
         //create + save in files
-        try {
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
-            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+//        try {
+//            ContentValues values = new ContentValues();
+//            values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
+//            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+//            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+//
+//            Uri uri = getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
+//
+//            if (uri != null) {
+//                OutputStream outputStream = getContentResolver().openOutputStream(uri);
+//
+//                PdfWriter writer = new PdfWriter(outputStream);
+//                PdfDocument pdf = new PdfDocument(writer);
+//                Document document = new Document(pdf);
+//                document.add(new Paragraph(recognizedText));
+//                document.close();
+//
+//                progressDialog.dismiss();
+//                Toast.makeText(TextRecognitionActivity.this, "PDF saved to Downloads", Toast.LENGTH_LONG).show();
+//            }
+//        } catch (Exception e) {
+//            Toast.makeText(TextRecognitionActivity.this, "Failed to save PDF", Toast.LENGTH_SHORT).show();
+//
+//        }
 
-            Uri uri = getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
+        //firebase
+        // Convertiți textul recunoscut într-un șir de octeți
 
-            if (uri != null) {
-                OutputStream outputStream = getContentResolver().openOutputStream(uri);
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                PdfWriter writer = new PdfWriter(outputStream);
-                PdfDocument pdf = new PdfDocument(writer);
-                Document document = new Document(pdf);
-                document.add(new Paragraph(recognizedText));
-                document.close();
+        if (currentUser != null) {
 
-                progressDialog.dismiss();
-                Toast.makeText(TextRecognitionActivity.this, "PDF saved to Downloads", Toast.LENGTH_LONG).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(TextRecognitionActivity.this, "Failed to save PDF", Toast.LENGTH_SHORT).show();
+            byte[] pdfBytes = null;
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            PdfWriter writer = new PdfWriter(outputStream);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
+            document.add(new Paragraph(recognizedText));
+            document.close();
+            pdfBytes = outputStream.toByteArray();
+
+            // Încărcați șirul de octeți în Firebase Storage
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+            StorageReference pdfRef = storageRef.child("pdfs").child(filename + ".pdf");
+            pdfRef.putBytes(pdfBytes)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // Obțineți URL-ul de descărcare al PDF-ului încărcat
+                        pdfRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                            String downloadUrl = uri.toString();
+
+                            // Apelați metoda addPdfFile din DatabaseConnection pentru a salva URL-ul de descărcare în baza de date
+                            DatabaseConnection.getInstance().addPdfFile(downloadUrl, filename, new DatabaseConnection.PdfUploadListener() {
+                                @Override
+                                public void onPdfUploadedSuccess() {
+                                    // PDF-ul a fost salvat cu succes în baza de date
+                                    Toast.makeText(getApplicationContext(), "PDF-ul a fost salvat cu succes în baza de date.", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onPdfUploadedFailure(String errorMessage) {
+                                    // A apărut o eroare la salvarea PDF-ului în baza de date
+                                    Toast.makeText(TextRecognitionActivity.this, "Failed to upload PDF", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            progressDialog.dismiss();
+
+                        });
+                    })
+                    .addOnFailureListener(exception -> {
+                        progressDialog.dismiss();
+                        Toast.makeText(TextRecognitionActivity.this, "Failed to upload PDF", Toast.LENGTH_SHORT).show();
+                    });
+
+        }else {
+            Toast.makeText(getApplicationContext(), "Utilizatorul nu este autentificat.", Toast.LENGTH_SHORT).show();
 
         }
+
+
+
+
+
     }
 
 
