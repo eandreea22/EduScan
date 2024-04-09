@@ -2,6 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,7 +21,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EduScan"
         tools:targetApi="31">
-        <activity android:name=".LoadingScreenActivity"
+        <activity
+            android:name=".TextRecognitionActivity"
+            android:exported="true" />
+        <activity
+            android:name=".LoadingScreenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,10 +45,7 @@
             android:exported="true" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-
-        </activity>
-        
+            android:exported="true"></activity>
     </application>
 
 </manifest>

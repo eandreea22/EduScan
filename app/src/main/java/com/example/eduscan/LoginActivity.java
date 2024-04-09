@@ -3,6 +3,7 @@ package com.example.eduscan;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -63,32 +64,60 @@ public class LoginActivity extends AppCompatActivity {
                     //check user exist
                     LiveData<Boolean> usernameExists = DatabaseConnection.getInstance().checkUsername(username);
 
-                    usernameExists.observe(LoginActivity.this, result -> {
+//                    usernameExists.observe(LoginActivity.this, result -> {
+//
+//                        if (result){
+//
+//                            LiveData<Boolean> correctPassword = DatabaseConnection.getInstance().checkPassword(username, password);
+//
+//                            correctPassword.observe(LoginActivity.this, result1 -> {
+//
+//                                if (result1){
+//
+//                                    //save user
+//                                    DatabaseConnection.getInstance().saveUser(username);
+//
+//                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                                    startActivity(intent);
+//
+//                                }else {
+//                                    Toast.makeText(LoginActivity.this, "The password is incorrect!", Toast.LENGTH_SHORT).show();
+//
+//                                }
+//
+//                            });
+//
+//                        }else {
+//                            Toast.makeText(LoginActivity.this, "The username doesn't exist!", Toast.LENGTH_SHORT).show();
+//
+//                        }
+//                    });
 
-                        if (result){
+                    usernameExists.observeForever(new Observer<Boolean>() {
+                        @Override
+                        public void onChanged(Boolean result) {
 
-                            LiveData<Boolean> correctPassword = DatabaseConnection.getInstance().checkPassword(username, password);
+                            if (result){
+                                LiveData<Boolean> correctPassword = DatabaseConnection.getInstance().checkPassword(username, password);
 
-                            correctPassword.observe(LoginActivity.this, result1 -> {
+                                correctPassword.observeForever(new Observer<Boolean>() {
+                                    @Override
+                                    public void onChanged(Boolean result1) {
+                                        if (result1){
+                                            //save user
+                                            DatabaseConnection.getInstance().saveUser(username);
 
-                                if (result1){
+                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                            startActivity(intent);
+                                        }else {
+                                            Toast.makeText(LoginActivity.this, "The password is incorrect!", Toast.LENGTH_SHORT).show();
 
-                                    //save user
-                                    DatabaseConnection.getInstance().saveUser(username);
-
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    startActivity(intent);
-
-                                }else {
-                                    Toast.makeText(LoginActivity.this, "The password is incorrect!", Toast.LENGTH_SHORT).show();
-
-                                }
-
-                            });
-
-                        }else {
-                            Toast.makeText(LoginActivity.this, "The username doesn't exist!", Toast.LENGTH_SHORT).show();
-
+                                        }
+                                    }
+                                });
+                            }else {
+                                Toast.makeText(LoginActivity.this, "The username doesn't exist!", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     });
 

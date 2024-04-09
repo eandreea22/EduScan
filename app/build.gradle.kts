@@ -33,12 +33,30 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    packagingOptions {
+        exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/LICENSE.md")
+        exclude("META-INF/NOTICE.md")
+    }
 }
 
 dependencies {
 
-//    implementation("com.google.android.gms:play-services-vision:20.1.3")
-//    implementation("com.theartofdev.edmodo:android-image-cropper:2.8.0")
+    //text-recognition ml lib
+    implementation ("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
+
+    //pdf
+    implementation("com.itextpdf:itext7-core:7.1.9");
+
+    //
+    implementation("com.quickbirdstudios:opencv-contrib:4.5.3.0")
+
+    //word
+    implementation("org.docx4j:docx4j-JAXB-ReferenceImpl:8.3.0") {
+        exclude(group = "commons-logging", module = "commons-logging")
+    }
+
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")

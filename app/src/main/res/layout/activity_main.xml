@@ -48,7 +48,9 @@
                 android:layout_gravity="right"
                 android:layout_marginRight="15dp"
                 android:clickable="true"
-                app:srcCompat="@drawable/profilepicture" />
+                android:contentDescription="@string/next"
+                app:srcCompat="@drawable/profilepicture"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <ScrollView
                 android:layout_width="match_parent"
