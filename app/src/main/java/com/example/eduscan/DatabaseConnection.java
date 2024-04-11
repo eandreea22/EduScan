@@ -20,6 +20,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DatabaseConnection {
 
     private User user = new User();
@@ -128,13 +131,41 @@ public class DatabaseConnection {
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
 
+                                        user.setEmail(email);
+                                        user.setPassword(password);
+
                                         // Autentificarea a reușit, obțineți utilizatorul curent
                                         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                                         if (firebaseUser != null) {
+
                                             // Salvare date utilizator în aplicație
-                                            String userId = firebaseUser.getUid();
-                                            user.setId(userId);
-                                            user.setEmail(email);
+                                            DatabaseReference reference = database.getReference("users");
+                                            Query query = reference.orderByChild("email").equalTo(email);
+
+                                            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if (snapshot.exists()){
+
+                                                        for (DataSnapshot userSnapshot : snapshot.getChildren()){
+                                                            String userId = userSnapshot.getKey();
+                                                            String name = userSnapshot.child("name").getValue(String.class);
+                                                            String username = userSnapshot.child("username").getValue(String.class);
+
+                                                            user.setName(name);
+                                                            user.setUsername(username);
+                                                            user.setId(userId);
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+                                                    System.out.println("error");
+                                                }
+                                            });
+
+
                                             // Apelați metoda onUserSaved din listener pentru a notifica activitatea că utilizatorul a fost salvat cu succes
                                             listener.onUserSaved(user);
                                         } else {
@@ -198,25 +229,6 @@ public class DatabaseConnection {
                 .addOnFailureListener(e -> listener.onUpdateFailure(e.getMessage()));
     }
 
-//    public void addPdfFile(String downloadUrl, String filename){
-//
-//        // Crearea unei referințe către nodul "files" al utilizatorului specificat
-//        StorageReference userFilesRef = FirebaseStorage.getInstance().getReference().child("users").child(user.getId()).child("files");
-//
-//        // Salvați URL-ul de descărcare în baza de date Firebase
-//        DatabaseReference userFilesDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getId()).child("files");
-//
-//        // Actualizarea bazei de date cu URL-ul de descărcare și numele fișierului asociat
-//        userFilesDatabaseRef.child(filename).setValue(downloadUrl)
-//                .addOnSuccessListener(aVoid -> {
-//                    // PDF-ul a fost salvat cu succes în baza de date
-//                    Toast.makeText(getApplicationContext(), "PDF-ul a fost salvat cu succes în baza de date.", Toast.LENGTH_SHORT).show();
-//                })
-//                .addOnFailureListener(e -> {
-//                    // A apărut o eroare la salvarea PDF-ului în baza de date
-//                    Toast.makeText(getApplicationContext(), "Eroare la salvarea PDF-ului în baza de date: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                });
-//    }
 
     public interface PdfUploadListener {
         void onPdfUploadedSuccess();
@@ -224,18 +236,24 @@ public class DatabaseConnection {
     }
 
     public void addPdfFile(String downloadUrl, String filename, PdfUploadListener listener) {
-        // Crearea unei referințe către nodul "files" al utilizatorului specificat
-        DatabaseReference userFilesDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getId()).child("files");
 
-        // Actualizarea bazei de date cu URL-ul de descărcare și numele fișierului asociat
-        userFilesDatabaseRef.child(filename).setValue(downloadUrl)
+        DatabaseReference userFilesDatabaseRef = database.getReference()
+                .child("users")
+                .child(user.getId())
+                .child("files"); // Referința către nodul "files" al userului
+
+        Map<String, Object> fileData = new HashMap<>();
+        fileData.put("nume", filename);
+        fileData.put("adresa_url", downloadUrl);
+
+        userFilesDatabaseRef.child(filename).setValue(fileData)
                 .addOnSuccessListener(aVoid -> {
-                    // PDF-ul a fost salvat cu succes în baza de date
+                    // Fișierul a fost salvat cu succes în baza de date
                     listener.onPdfUploadedSuccess();
                 })
                 .addOnFailureListener(e -> {
-                    // A apărut o eroare la salvarea PDF-ului în baza de date
-                    listener.onPdfUploadedFailure("Eroare la salvarea PDF-ului în baza de date: " + e.getMessage());
+                    // A apărut o eroare la salvarea fișierului în baza de date
+                    listener.onPdfUploadedFailure("Eroare la salvarea fișierului în baza de date: " + e.getMessage());
                 });
     }
 

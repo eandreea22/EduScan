@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.lifecycle.LiveData;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -112,24 +113,41 @@ public class ProfileActivity extends AppCompatActivity {
                 String newUsername = profileCompleteUsername.getText().toString().trim();
                 if (!newUsername.isEmpty() && !newUsername.equals(DatabaseConnection.getInstance().getUser().getUsername()) && isValidUsername(newUsername)) {
 
-                    DatabaseConnection.getInstance().changeUsername(newUsername, new DatabaseUpdateListener() {
-                        @Override
-                        public void onUpdateSuccess() {
-                            runOnUiThread(() -> {
-                                profileCompleteUsername.setText(newUsername);
-                                Toast.makeText(ProfileActivity.this, "Updated successfully!", Toast.LENGTH_SHORT).show();
+                    // verif if username exists
+                    LiveData<Boolean> usernameExists = DatabaseConnection.getInstance().checkUsername(newUsername);
 
+                    usernameExists.observe(ProfileActivity.this, result -> {
+
+                        if (result){
+                            Toast.makeText(ProfileActivity.this, "Username already exists!", Toast.LENGTH_SHORT).show();
+
+                        }else {
+
+                            // change username
+                            DatabaseConnection.getInstance().changeUsername(newUsername, new DatabaseUpdateListener() {
+                                @Override
+                                public void onUpdateSuccess() {
+                                    runOnUiThread(() -> {
+                                        profileCompleteUsername.setText(newUsername);
+                                        Toast.makeText(ProfileActivity.this, "Updated successfully!", Toast.LENGTH_SHORT).show();
+
+                                    });
+                                }
+
+                                @Override
+                                public void onUpdateFailure(String errorMessage) {
+                                    runOnUiThread(() -> {
+                                        Toast.makeText(ProfileActivity.this, "Failed to update username", Toast.LENGTH_SHORT).show();
+
+                                    });
+                                }
                             });
+
                         }
 
-                        @Override
-                        public void onUpdateFailure(String errorMessage) {
-                            runOnUiThread(() -> {
-                                Toast.makeText(ProfileActivity.this, "Failed to update username", Toast.LENGTH_SHORT).show();
-
-                            });
-                        }
                     });
+
+
 
                 }else {
                     Toast.makeText(ProfileActivity.this, "Not a valid username!", Toast.LENGTH_SHORT).show();

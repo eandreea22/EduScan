@@ -551,9 +551,8 @@ public class TextRecognitionActivity extends AppCompatActivity {
         }
     }
 
-    private void saveTextAsPDF(String recognizedText, String filename) {
 
-        //create + save in files
+    //create + save in files
 //        try {
 //            ContentValues values = new ContentValues();
 //            values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
@@ -579,6 +578,10 @@ public class TextRecognitionActivity extends AppCompatActivity {
 //
 //        }
 
+    private void saveTextAsPDF(String recognizedText, String filename) {
+
+
+
         //firebase
         // Convertiți textul recunoscut într-un șir de octeți
 
@@ -598,7 +601,7 @@ public class TextRecognitionActivity extends AppCompatActivity {
 
             // Încărcați șirul de octeți în Firebase Storage
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-            StorageReference pdfRef = storageRef.child("pdfs").child(filename + ".pdf");
+            StorageReference pdfRef = storageRef.child("pdfs/").child(filename + ".pdf");
             pdfRef.putBytes(pdfBytes)
                     .addOnSuccessListener(taskSnapshot -> {
                         // Obțineți URL-ul de descărcare al PDF-ului încărcat
