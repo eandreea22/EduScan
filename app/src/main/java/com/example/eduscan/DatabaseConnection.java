@@ -1,5 +1,7 @@
 package com.example.eduscan;
 
+import static com.google.firebase.appcheck.internal.util.Logger.TAG;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -20,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -131,8 +134,8 @@ public class DatabaseConnection {
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
 
-                                        user.setEmail(email);
-                                        user.setPassword(password);
+//                                        user.setEmail(email);
+//                                        user.setPassword(password);
 
                                         // Autentificarea a reușit, obțineți utilizatorul curent
                                         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -152,8 +155,10 @@ public class DatabaseConnection {
                                                             String name = userSnapshot.child("name").getValue(String.class);
                                                             String username = userSnapshot.child("username").getValue(String.class);
 
-                                                            user.setName(name);
-                                                            user.setUsername(username);
+//                                                            user.setName(name);
+//                                                            user.setUsername(username);
+
+                                                            user = new User(name, username, email, password);
                                                             user.setId(userId);
                                                         }
                                                     }
@@ -256,6 +261,48 @@ public class DatabaseConnection {
                     listener.onPdfUploadedFailure("Eroare la salvarea fișierului în baza de date: " + e.getMessage());
                 });
     }
+
+    public interface FilesUpdateListener {
+        void onFilesUpdated(ArrayList<FileModel> fileList);
+        void onDatabaseError(DatabaseError databaseError);
+    }
+
+
+
+    public void updateFiles(FilesUpdateListener listener){
+
+        // Caută utilizatorul cu cheia specificată în baza de date
+        DatabaseReference reference = database.getReference("users");
+        Query query = reference.orderByKey().equalTo(user.getId());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        // Obține lista de fișiere ale utilizatorului
+                        DataSnapshot filesSnapshot = userSnapshot.child("files");
+                        for (DataSnapshot fileSnapshot : filesSnapshot.getChildren()) {
+                            String fileName = fileSnapshot.child("nume").getValue(String.class);
+                            String filePath = fileSnapshot.child("adresa_url").getValue(String.class);
+                            user.addFile(new FileModel(fileName, filePath));
+                        }
+                        listener.onFilesUpdated(user.getFiles());
+                    }
+                } else {
+                    // Utilizatorul nu există în baza de date
+                    // Poți trata această situație aici
+                    Log.e(TAG, "UpdateFiles: key not found");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle errors
+                listener.onDatabaseError(databaseError);
+            }
+        });
+    }
+
 
 
 

@@ -53,15 +53,17 @@
                     android:padding="15dp"
                     android:text="Your Profile"
                     android:textAlignment="viewStart"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    tools:layout_gravity="center" />
 
                 <ImageView
                     android:id="@+id/imageView"
-                    android:layout_width="81dp"
+                    android:layout_width="53dp"
                     android:layout_height="45dp"
                     android:layout_gravity="right"
                     android:layout_marginRight="15dp"
-                    app:srcCompat="@drawable/profilepicture" />
+                    app:srcCompat="@drawable/profilepicture"
+                    tools:layout_gravity="center" />
 
             </LinearLayout>
 

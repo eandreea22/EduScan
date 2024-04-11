@@ -12,6 +12,7 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView goToProfile;
     Button buttonScan;
+    Button buttonFiles;
 
 
     @Override
@@ -23,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
         goToProfile = findViewById(R.id.goToProfile);
 
         buttonScan = findViewById(R.id.buttonScan);
+
+        buttonFiles = findViewById(R.id.buttonFiles);
 
         goToProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,6 +39,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, TextRecognitionActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        buttonFiles.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, FilesActivity.class);
                 startActivity(intent);
             }
         });

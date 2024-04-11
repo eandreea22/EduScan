@@ -601,7 +601,7 @@ public class TextRecognitionActivity extends AppCompatActivity {
 
             // Încărcați șirul de octeți în Firebase Storage
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-            StorageReference pdfRef = storageRef.child("pdfs/").child(filename + ".pdf");
+            StorageReference pdfRef = storageRef.child("files/").child(filename + ".pdf");
             pdfRef.putBytes(pdfBytes)
                     .addOnSuccessListener(taskSnapshot -> {
                         // Obțineți URL-ul de descărcare al PDF-ului încărcat
