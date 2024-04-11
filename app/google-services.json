@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1040909162918",
+    "firebase_url": "https://licenta-21140-default-rtdb.firebaseio.com",
+    "project_id": "licenta-21140",
+    "storage_bucket": "licenta-21140.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1040909162918:android:a1810ce21259ae0e571767",
+        "android_client_info": {
+          "package_name": "com.example.eduscan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrjdyD20LF95JhhxmY4nSHRXgN4uTLFOI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
