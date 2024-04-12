@@ -70,4 +70,18 @@ public class User {
     public ArrayList<FileModel> getFiles() {
         return files;
     }
+
+    public void editFileName(String oldName, String newName){
+
+        for (int i=0; i<files.size(); i++){
+            if (files.get(i).getFileName().equals(oldName)){
+                files.get(i).setFileName(newName);
+                break;
+            }
+        }
+
+
+    }
+
+
 }

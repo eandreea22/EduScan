@@ -52,6 +52,80 @@
                 app:srcCompat="@drawable/profilepicture"
                 tools:ignore="TouchTargetSizeCheck" />
 
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:fontFamily="sans-serif-black"
+                android:text="Your files"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="340dp"
+                android:layout_height="43dp"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <ImageView
+                    android:id="@+id/editFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:alpha="1"
+                    android:clickable="true"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/edit"
+                    tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+                <ImageView
+                    android:id="@+id/viewFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:alpha="1"
+                    android:scaleX="1.4"
+                    android:scaleY="1.4"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/view"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                <ImageView
+                    android:id="@+id/downloadFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/downloads"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                <ImageView
+                    android:id="@+id/shareFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:padding="3dp"
+                    app:srcCompat="@drawable/share"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+                <ImageView
+                    android:id="@+id/deleteFile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:padding="3dp"
+                    android:scaleX="1.15"
+                    android:scaleY="1.15"
+                    app:srcCompat="@drawable/delete"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+            </LinearLayout>
+
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -62,14 +136,6 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:padding="5dp">
-
-                    <TextView
-                        android:id="@+id/textView2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-black"
-                        android:text="Your files"
-                        android:textSize="20sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerViewFiles"

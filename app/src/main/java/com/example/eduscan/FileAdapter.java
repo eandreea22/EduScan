@@ -18,8 +18,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
 
     private ArrayList<FileModel> fileList;
-    private boolean isSelectionMode = false;
     private ArrayList<String> selectedFiles = new ArrayList<>();
+    private SelectionChangeListener listener;
 
     public FileAdapter(ArrayList<FileModel> fileList) {
         this.fileList = fileList;
@@ -54,6 +54,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 //        } else {
 //            holder.fileCheckBox.setVisibility(View.GONE);
 //        }
+
         FileModel file = fileList.get(position);
         holder.fileNameTextView.setText(file.getFileName());
         holder.fileCheckBox.setChecked(selectedFiles.contains(file.getFileName()));
@@ -65,7 +66,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             } else {
                 selectedFiles.remove(file.getFileName());
             }
+            listener.onSelectionChanged(selectedFiles.size());
         });
+
     }
 
     @Override
@@ -73,11 +76,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         return fileList.size();
     }
 
-    // Activează/desactivează modul de selecție
-    public void setSelectionMode(boolean isSelectionMode) {
-        this.isSelectionMode = isSelectionMode;
-        notifyDataSetChanged(); // Actualizează afișajul pentru fiecare element
-    }
 
     // Returnează fișierele selectate
     public ArrayList<String> getSelectedFiles() {
@@ -87,6 +85,8 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         this.fileList = fileList;
         notifyDataSetChanged();
     }
+
+
 
     // Clasa internă pentru ținerea elementelor de fișier
     static class FileViewHolder extends RecyclerView.ViewHolder {
@@ -99,4 +99,15 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             fileCheckBox = itemView.findViewById(R.id.fileCheckBox);
         }
     }
+
+    public void setSelectionChangeListener(SelectionChangeListener listener) {
+        this.listener = listener;
+    }
+
+    interface SelectionChangeListener {
+        void onSelectionChanged(int numSelected);
+    }
 }
+
+
+

@@ -16,4 +16,8 @@ public class FileModel {
     public String getFilePath() {
         return filePath;
     }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 }
