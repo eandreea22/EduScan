@@ -27,9 +27,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DatabaseError;
 
+import org.xml.sax.DTDHandler;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FilesActivity extends AppCompatActivity implements FileAdapter.SelectionChangeListener{
 
@@ -158,7 +161,7 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
         });
 
 
-        //
+        /////////////////
         editFileClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -188,27 +191,35 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                                 fileAdapter.updateFiles(DatabaseConnection.getInstance().getUser().getFiles());
                                 fileAdapter.notifyDataSetChanged();
 
+
                                 // Actualizează numele fișierului în Firebase Realtime Database și Firebase Storage
-                                try {
-                                    DatabaseConnection.getInstance().editFileName(fileName, newName, new DatabaseConnection.DatabaseActionListener() {
+                                DatabaseConnection.getInstance().editFileNameStorage(fileName, newName, new DatabaseConnection.DatabaseActionListener() {
 
-                                        @Override
-                                        public void onSuccess() {
-                                            Toast.makeText(FilesActivity.this, "Done", Toast.LENGTH_SHORT).show();
+                                    @Override
+                                    public void onSuccess(){
 
-                                        }
+                                        DatabaseConnection.getInstance().editFileNameRealtime(fileName, newName, new DatabaseConnection.DatabaseActionListener() {
+                                            @Override
+                                            public void onSuccess() {
+                                                Toast.makeText(FilesActivity.this, "Done", Toast.LENGTH_SHORT).show();
+                                            }
 
-                                        @Override
-                                        public void onFailure(String errorMessage) {
-                                            // Operația în Realtime Database a eșuat
-                                            // Afișează sau gestionează mesajul de eroare
-                                            Toast.makeText(FilesActivity.this, "error ", Toast.LENGTH_SHORT).show();
+                                            @Override
+                                            public void onFailure(String errorMessage) {
+                                                Toast.makeText(FilesActivity.this, "error 1 ", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
 
-                                        }
-                                    });
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                    }
+
+                                    @Override
+                                    public void onFailure(String errorMessage) {
+                                        // Operația în Realtime Database a eșuat
+                                        // Afișează sau gestionează mesajul de eroare
+                                        Toast.makeText(FilesActivity.this, "error ", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
 
                             }
                         });
@@ -239,31 +250,93 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
         };
 
 
+
+        downloadFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseConnection.DatabaseActionListener downloadListener = new DatabaseConnection.DatabaseActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        // Acțiuni în caz de succes
+                        Toast.makeText(FilesActivity.this, "Download successful", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        // Acțiuni în caz de eșec
+                        Toast.makeText(FilesActivity.this, "Download failed: " + errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                };
+
+                DatabaseConnection.getInstance().downloadFiles(FilesActivity.this, fileAdapter.getSelectedFiles(), downloadListener);
+
+            }
+
+        });
+
+        deleteFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DatabaseConnection.getInstance().deleteFilesStorage(fileAdapter.getSelectedFiles(), new DatabaseConnection.DatabaseActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        DatabaseConnection.getInstance().deleteFilesRealtime(fileAdapter.getSelectedFiles(), new DatabaseConnection.DatabaseActionListener() {
+                            @Override
+                            public void onSuccess() {
+
+                                DatabaseConnection.getInstance().getUser().removeFiles(fileAdapter.getSelectedFiles());
+
+                                fileAdapter.updateFiles(DatabaseConnection.getInstance().getUser().getFiles());
+                                fileAdapter.notifyDataSetChanged();
+
+                                Toast.makeText(FilesActivity.this, "Deleted successful", Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure(String errorMessage) {
+                                Toast.makeText(FilesActivity.this, "error realtime", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        Toast.makeText(FilesActivity.this, "error storage", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
     }
 
     @Override
     public void onSelectionChanged(int numSelected) {
+
         // Verifică numărul de fișiere selectate și actualizează opacitatea icoanei în consecință
-        if (numSelected > 1) {
-            editFile.setAlpha(0.5f); // Setează opacitatea la jumătate
-            viewFile.setAlpha(0.5f);
+        if (fileAdapter.getItemCount() != 1){
+            if (numSelected > 1) {
+                editFile.setAlpha(0.5f); // Setează opacitatea la jumătate
+                viewFile.setAlpha(0.5f);
 
-            // Dezactivează click-ul pe imaginile editFile și viewFile
-            editFile.setOnClickListener(null);
-            viewFile.setOnClickListener(null);
-            editFile.setOnTouchListener(null);
-            viewFile.setOnTouchListener(null);
+                // Dezactivează click-ul pe imaginile editFile și viewFile
+                editFile.setOnClickListener(null);
+                viewFile.setOnClickListener(null);
+                editFile.setOnTouchListener(null);
+                viewFile.setOnTouchListener(null);
 
-        } else {
-            editFile.setAlpha(1.0f); // Resetare opacitate la normal
-            viewFile.setAlpha(1.0f);
+            } else {
+                editFile.setAlpha(1.0f); // Resetare opacitate la normal
+                viewFile.setAlpha(1.0f);
 
-            // Re-activează click-ul pe imaginile editFile și viewFile
-            editFile.setOnClickListener(editFileClickListener);
-            viewFile.setOnClickListener(viewFileClickListener);
+                // Re-activează click-ul pe imaginile editFile și viewFile
+                editFile.setOnClickListener(editFileClickListener);
+                viewFile.setOnClickListener(viewFileClickListener);
 
-            editFile.setOnTouchListener(editFileTouchListener);
-            viewFile.setOnTouchListener(viewFileTouchListener);
+                editFile.setOnTouchListener(editFileTouchListener);
+                viewFile.setOnTouchListener(viewFileTouchListener);
+            }
         }
+
     }
 }

@@ -1,5 +1,7 @@
 package com.example.eduscan;
 
+import android.content.Intent;
+
 import java.util.ArrayList;
 
 public class User {
@@ -80,6 +82,27 @@ public class User {
             }
         }
 
+
+    }
+
+    public void removeFiles(ArrayList<String> deleteFiles){
+
+        ArrayList<Integer> positionfiles = new ArrayList<>();
+
+        for (String file: deleteFiles) {
+
+            for (int i = 0 ; i < files.size(); i++){
+                if (files.get(i).getFileName().equals(file)){
+                    positionfiles.add(i);
+                    break;
+                }
+            }
+        }
+
+        for (int i=0; i< positionfiles.size(); i++){
+            files.remove((int) positionfiles.get(i));
+        }
+        System.out.println(files);
 
     }
 

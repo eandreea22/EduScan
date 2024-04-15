@@ -2,7 +2,9 @@ package com.example.eduscan;
 
 import static com.google.firebase.appcheck.internal.util.Logger.TAG;
 
+import android.content.Context;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -32,6 +34,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DatabaseConnection {
 
@@ -316,7 +320,7 @@ public class DatabaseConnection {
     }
 
 
-    public void editFileName(String oldName, String newName, DatabaseActionListener listener) throws IOException {
+    public void editFileNameRealtime(String oldName, String newName, DatabaseActionListener listener){
 
         // Creează o referință către fișierul din baza de date Firebase
         DatabaseReference fileRef = FirebaseDatabase.getInstance().getReference()
@@ -333,6 +337,55 @@ public class DatabaseConnection {
                     @Override
                     public void onSuccess(Void aVoid) {
 
+                        DatabaseReference userFilesRef = FirebaseDatabase.getInstance().getReference()
+                                .child("users")
+                                .child(user.getId())
+                                .child("files");
+
+                        // Verifică dacă există fișierul cu cheia veche (oldName)
+                        userFilesRef.child(oldName).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    // Obține datele fișierului existent
+                                    Object fileData = dataSnapshot.getValue();
+
+                                    // Șterge fișierul vechi cu cheia veche
+                                    userFilesRef.child(oldName).removeValue();
+
+                                    // Adaugă fișierul cu cheia nouă și datele actualizate
+                                    userFilesRef.child(newName).setValue(fileData)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    // Actualizarea cheii și numele fișierului s-a efectuat cu succes
+                                                    listener.onSuccess();
+                                                    Log.d(TAG, "File name and key updated successfully");
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    // A apărut o eroare la actualizarea cheii și numele fișierului
+                                                    listener.onFailure("Error updating file name and key in Realtime Database");
+                                                    Log.e(TAG, "Error updating file name and key: " + e.getMessage());
+                                                }
+                                            });
+                                } else {
+                                    // Fișierul cu cheia veche nu există în baza de date
+                                    listener.onFailure("File with old key does not exist in Realtime Database");
+                                    Log.e(TAG, "File with old key does not exist in Realtime Database");
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                // A apărut o eroare în timpul accesării datelor din baza de date
+                                listener.onFailure("Error accessing file data in Realtime Database");
+                                Log.e(TAG, "Error accessing file data: " + databaseError.getMessage());
+                            }
+                        });
+
                         listener.onSuccess();
                         Log.d(TAG, "File name updated successfully");
                     }
@@ -346,75 +399,170 @@ public class DatabaseConnection {
                     }
                 });
 
+    }
 
-        //
 
+    public void editFileNameStorage(String oldName, String newName, DatabaseActionListener listener) {
         // Obține referința către fișierul vechi din Firebase Storage
         StorageReference oldFileRef = FirebaseStorage.getInstance().getReference()
                 .child("files/")
-                .child(user.getId())
-                .child(oldName);
+                .child(oldName + ".pdf");
 
         // Descarcă fișierul vechi într-un fișier temporar pe dispozitivul local
-        File localFile = File.createTempFile("temp_file", /* suffix */ null);
+        File localFile;
+        try {
+            localFile = File.createTempFile("temp_file", "*");
+        } catch (IOException e) {
+            e.printStackTrace();
+            listener.onFailure("Error creating temporary file");
+            return;
+        }
+
         oldFileRef.getFile(localFile)
-                .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        // Descărcarea fișierului vechi a fost realizată cu succes
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Descărcarea fișierului vechi a fost realizată cu succes
 
-                        // Obține referința către noul fișier din Firebase Storage
-                        StorageReference newFileRef = FirebaseStorage.getInstance().getReference()
-                                .child("files")
-                                .child(user.getId())
-                                .child(newName);
+                    // Obține referința către noul fișier din Firebase Storage
+                    StorageReference newFileRef = FirebaseStorage.getInstance().getReference()
+                            .child("files/")
+                            .child(newName);
 
-                        // Încarcă fișierul descărcat înapoi pe Firebase Storage cu noul nume
-                        newFileRef.putFile(Uri.fromFile(localFile))
-                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        // Încărcarea fișierului nou cu noul nume a fost realizată cu succes
+                    // Încarcă fișierul descărcat înapoi pe Firebase Storage cu noul nume
+                    newFileRef.putFile(Uri.fromFile(localFile))
+                            .addOnSuccessListener(taskSnapshot1 -> {
+                                // Încărcarea fișierului nou cu noul nume a fost realizată cu succes
 
-                                        // Șterge fișierul vechi din Firebase Storage
-                                        oldFileRef.delete()
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        // Ștergerea fișierului vechi a fost realizată cu succes
-                                                        listener.onSuccess();
-                                                        Log.d(TAG, "Old file deleted successfully");
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        // A apărut o eroare la ștergerea fișierului vechi
-                                                        listener.onFailure("Error deleting old file");
-                                                        Log.e(TAG, "Error deleting old file: " + e.getMessage());
-                                                    }
-                                                });
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        // A apărut o eroare la încărcarea fișierului nou cu noul nume
-                                        listener.onFailure("Error updating file name in Storage Database");
-
-                                        Log.e(TAG, "Error uploading new file: " + e.getMessage());
-                                    }
-                                });
-                    }
+                                // Șterge fișierul vechi din Firebase Storage
+                                oldFileRef.delete()
+                                        .addOnSuccessListener(aVoid -> {
+                                            // Ștergerea fișierului vechi a fost realizată cu succes
+                                            listener.onSuccess();
+                                            Log.d(TAG, "Old file deleted successfully");
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // A apărut o eroare la ștergerea fișierului vechi
+                                            listener.onFailure("Error deleting old file");
+                                            Log.e(TAG, "Error deleting old file: " + e.getMessage());
+                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                // A apărut o eroare la încărcarea fișierului nou cu noul nume
+                                listener.onFailure("Error uploading new file");
+                                Log.e(TAG, "Error uploading new file: " + e.getMessage());
+                            });
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // A apărut o eroare la descărcarea fișierului vechi
-                        Log.e(TAG, "Error downloading old file: " + e.getMessage());
-                    }
+                .addOnFailureListener(e -> {
+                    // A apărut o eroare la descărcarea fișierului vechi
+                    listener.onFailure("Error downloading old file");
+                    Log.e(TAG, "Error downloading old file: " + e.getMessage());
+                });
+    }
+
+
+
+    public void downloadFile(Context context, String fileName, DatabaseActionListener listener){
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        // Creează o referință către fișierul dorit
+        StorageReference storageRef = storage.getReference().child("files/" + fileName );
+
+        // Creează un obiect File pentru a reprezenta locația în care va fi salvat fișierul
+        File localFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName + ".pdf");
+
+
+        // Descarcă fișierul din Firebase Storage
+        storageRef.getFile(localFile)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Descărcarea a fost realizată cu succes
+                    Log.d(TAG, "Download successful: " + localFile.getPath());
+                    // Acum poți folosi fișierul local pentru ce ai nevoie
+                    listener.onSuccess();
+                })
+                .addOnFailureListener(exception -> {
+                    // Descărcarea a eșuat
+                    Log.e(TAG, "Download failed: " + exception.getMessage());
+                    listener.onFailure("Download failed");
                 });
 
+    }
+
+    public void downloadFiles(Context context, ArrayList<String> fileNames, DatabaseActionListener listener) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        AtomicInteger filesDownloaded = new AtomicInteger(0);
+        int numFiles = fileNames.size();
+
+        for (String fileName : fileNames) {
+            StorageReference storageRef = storage.getReference().child("files/" + fileName);
+            File localFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName + ".pdf");
+
+            storageRef.getFile(localFile)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        int downloaded = filesDownloaded.incrementAndGet();
+                        if (downloaded == numFiles) {
+                            listener.onSuccess();
+                        }
+                    })
+                    .addOnFailureListener(exception -> {
+                        listener.onFailure("Failed to download file " + fileName);
+                    });
+        }
+    }
+
+
+
+    ///
+    public void deleteFilesStorage(ArrayList<String> files, DatabaseActionListener listener){
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        AtomicInteger filesDeleted = new AtomicInteger(0);
+        int numFiles = files.size();
+
+        for (String fileName: files){
+            StorageReference fileRef = storage.getReference().child("files/" + fileName);
+
+            fileRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    int deleted = filesDeleted.incrementAndGet();
+                    if (deleted == numFiles) {
+                        listener.onSuccess();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    listener.onFailure("Error deleting file " + e);
+                }
+            });
+        }
+
+    }
+
+    public void deleteFilesRealtime(ArrayList<String> files, DatabaseActionListener listener){
+
+
+        DatabaseReference databaseRef = database.getReference().child("users").child(user.getId()).child("files"); // Înlocuiți "userId" cu id-ul utilizatorului corespunzător
+
+        AtomicInteger filesDeleted = new AtomicInteger(0);
+
+        for (String fileName : files) {
+            databaseRef.child(fileName).removeValue()
+                    .addOnSuccessListener(aVoid -> {
+                        int count = filesDeleted.incrementAndGet();
+                        Log.d(TAG, "File deleted successfully: " + fileName);
+                        if (count == files.size()) {
+                            // Toate fișierele au fost șterse
+                            Log.d(TAG, "All files deleted successfully Realtime");
+                            listener.onSuccess();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Realtime Error deleting file " + fileName + ": " + e.getMessage());
+                        listener.onFailure("Error deleting file " + e);
+                    });
+        }
 
     }
 

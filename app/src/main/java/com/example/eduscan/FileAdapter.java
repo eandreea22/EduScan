@@ -34,26 +34,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull FileViewHolder holder, int position) {
-//        FileModel file = fileList.get(position);
-//        holder.fileNameTextView.setText(file.getFileName());
-//
-//        // Ascultător pentru selectarea/deselectarea fișierului
-//        holder.fileCheckBox.setOnCheckedChangeListener(null); // Evită reacția în lanț
-//        holder.fileCheckBox.setChecked(selectedFiles.contains(file.getFileName()));
-//
-//        // Dacă selecția este activată, afișează caseta de selectare și activează ascultătorul
-//        if (isSelectionMode) {
-//            holder.fileCheckBox.setVisibility(View.VISIBLE);
-//            holder.fileCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-//                if (isChecked) {
-//                    selectedFiles.add(file.getFileName());
-//                } else {
-//                    selectedFiles.remove(file.getFileName());
-//                }
-//            });
-//        } else {
-//            holder.fileCheckBox.setVisibility(View.GONE);
-//        }
 
         FileModel file = fileList.get(position);
         holder.fileNameTextView.setText(file.getFileName());
