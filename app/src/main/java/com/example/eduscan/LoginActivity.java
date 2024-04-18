@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -96,6 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                     DatabaseConnection.getInstance().saveUser(email.trim(), password, new DatabaseConnection.UserSaveListener() {
                         @Override
                         public void onUserSaved(User user) {
+
                             // Autentificarea și salvarea utilizatorului au reușit
                             // Aici puteți gestiona următorul pas sau acțiune în funcție de nevoile dvs.
                             // De exemplu, puteți redirecționa utilizatorul către activitatea principală

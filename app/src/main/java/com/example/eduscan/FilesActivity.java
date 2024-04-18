@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -81,8 +82,10 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
             @Override
             public void onFilesUpdated(ArrayList<FileModel> fileList) {
 
+
                 fileAdapter.updateFiles(fileList);
                 fileAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -307,6 +310,37 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                 });
             }
         });
+
+        shareFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Obține adresele URL pentru fișierele selectate
+                DatabaseConnection.getInstance().getUrlForMultipleFiles(fileAdapter.getSelectedFiles(), new DatabaseConnection.MultipleFileUrlListener() {
+                    @Override
+                    public void onMultipleFileUrlsReceived(ArrayList<String> fileUrisFromDatabase) {
+
+                        ArrayList<Uri> fileUris = new ArrayList<>();
+
+                        for (String uriString : fileUrisFromDatabase) {
+                            // Convertiți șirurile URI în obiecte Uri
+                            Uri uri = Uri.parse(uriString);
+                            System.out.println(uriString);
+                            fileUris.add(uri);
+                        }
+
+                        // Crearea unei intentii de partajare
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
+                        // Setarea tipului de date al intentiei
+                        shareIntent.setType("application/pdf"); // Specificați tipul de fișier, în acest caz PDF
+                        // Adăugarea URI-urilor fișierelor la intentia de partajare
+                        shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fileUris);
+                        // Pornirea activității de partajare cu un chooser pentru a selecta aplicația
+                        startActivity(Intent.createChooser(shareIntent, "Share files"));
+                    }
+                });
+            }
+        });
+
 
     }
 

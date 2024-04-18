@@ -289,14 +289,38 @@ public class DatabaseConnection {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
-                        // Obține lista de fișiere ale utilizatorului
+
+                        ArrayList<FileModel> filesFromDatabase = new ArrayList<>();
+
+                        //luam fisierele din baza de date
+
                         DataSnapshot filesSnapshot = userSnapshot.child("files");
                         for (DataSnapshot fileSnapshot : filesSnapshot.getChildren()) {
                             String fileName = fileSnapshot.child("nume").getValue(String.class);
                             String filePath = fileSnapshot.child("adresa_url").getValue(String.class);
-                            user.addFile(new FileModel(fileName, filePath));
+                            filesFromDatabase.add(new FileModel(fileName, filePath));
+                        }
+
+
+                        //verificam daca s au facut schimbari
+                        if (!user.getFiles().equals(filesFromDatabase)){
+
+                            ArrayList<FileModel> newFiles = new ArrayList<>();
+
+                            for (FileModel newFile : filesFromDatabase) {
+
+                                if (!user.getFiles().contains(newFile)) {
+                                    newFiles.add(newFile);
+
+                                }
+                            }
+
+                            for (FileModel file : newFiles){
+                                user.addFile(file);
+                            }
                         }
                         listener.onFilesUpdated(user.getFiles());
+
                     }
                 } else {
                     // Utilizatorul nu există în baza de date
@@ -565,6 +589,44 @@ public class DatabaseConnection {
         }
 
     }
+
+    // Definește interfața pentru ascultătorul acțiunilor din bază de date
+    public interface MultipleFileUrlListener {
+        void onMultipleFileUrlsReceived(ArrayList<String> fileUrls);
+    }
+
+    public void getUrlForMultipleFiles(ArrayList<String> fileNames, MultipleFileUrlListener listener) {
+
+        DatabaseReference filesReference = database.getReference().child("users").child(user.getId()).child("files");
+
+        ArrayList<String> fileUrls = new ArrayList<>();
+
+        // Iterează prin fiecare nume de fișier și obține URL-ul corespunzător
+        for (String fileName : fileNames) {
+            filesReference.child(fileName).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        String fileUrl = dataSnapshot.child("adresa_url").getValue(String.class);
+                        fileUrls.add(fileUrl);
+
+                        // Dacă am obținut URL-ul pentru toate fișierele, trimite lista către activitate
+                        if (fileUrls.size() == fileNames.size()) {
+                            listener.onMultipleFileUrlsReceived(fileUrls);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Tratează cazul în care citirea din baza de date nu reușește
+                    Log.d("Firebase Error", databaseError.getMessage());
+                }
+            });
+        }
+    }
+
+
 
 
 

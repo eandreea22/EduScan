@@ -25,6 +25,12 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         this.fileList = fileList;
     }
 
+    public ArrayList<FileModel> getFileList() {
+        return fileList;
+    }
+
+
+
     @NonNull
     @Override
     public FileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -63,6 +69,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     }
     public void updateFiles(ArrayList<FileModel> fileList) {
         this.fileList = fileList;
+        notifyDataSetChanged();
+    }
+
+    public void addFile(FileModel file){
+        this.fileList.add(file);
         notifyDataSetChanged();
     }
 
