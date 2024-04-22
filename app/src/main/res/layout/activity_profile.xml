@@ -68,7 +68,6 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/profileTextName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -80,8 +79,8 @@
                 android:textSize="14sp"
                 android:textStyle="italic" />
 
-            <AutoCompleteTextView
-                android:id="@+id/profileCompleteName"
+            <TextView
+                android:id="@+id/profileTextViewName"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -89,16 +88,60 @@
                 android:layout_marginBottom="10dp"
                 android:background="#A4FFFFFF"
                 android:backgroundTint="#2FFFFEFE"
+                android:clickable="true"
                 android:ems="10"
                 android:fontFamily="sans-serif-medium"
                 android:inputType="text"
                 android:minHeight="48dp"
                 android:padding="10dp"
                 android:text="name"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="visible" />
+
+
+            <LinearLayout
+                android:id="@+id/LayoutEditName"
+                android:layout_width="300dp"
+                android:layout_height="55dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <AutoCompleteTextView
+                    android:id="@+id/autoCompleteTextViewName"
+                    android:layout_width="278dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1"
+                    android:background="#A4FFFFFF"
+                    android:backgroundTint="#2FFFFEFE"
+                    android:ems="10"
+                    android:fontFamily="sans-serif-medium"
+                    android:inputType="text"
+                    android:minHeight="48dp"
+                    android:padding="5dp"
+                    android:text="name"
+                    android:textSize="16sp"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <ImageView
+                    android:id="@+id/buttonEditName"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/edit" />
+
+
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/profileTextUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -110,8 +153,8 @@
                 android:textSize="14sp"
                 android:textStyle="italic" />
 
-            <AutoCompleteTextView
-                android:id="@+id/profileCompleteUsername"
+            <TextView
+                android:id="@+id/profileTextViewUsername"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -119,16 +162,61 @@
                 android:layout_marginBottom="10dp"
                 android:background="#A4FFFFFF"
                 android:backgroundTint="#2FFFFEFE"
+                android:clickable="true"
                 android:ems="10"
                 android:fontFamily="sans-serif-medium"
                 android:inputType="text"
                 android:minHeight="48dp"
                 android:padding="10dp"
                 android:text="username"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/LayoutEditUsername"
+                android:layout_width="300dp"
+                android:layout_height="55dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <AutoCompleteTextView
+                    android:id="@+id/autoCompleteTextViewUsername"
+                    android:layout_width="278dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1"
+                    android:background="#A4FFFFFF"
+                    android:backgroundTint="#2FFFFEFE"
+                    android:ems="10"
+                    android:fontFamily="sans-serif-medium"
+                    android:inputType="text"
+                    android:minHeight="48dp"
+                    android:padding="5dp"
+                    android:text="username"
+                    android:textSize="16sp"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <ImageView
+                    android:id="@+id/buttonEditUsername"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/edit" />
+
+
+            </LinearLayout>
+
+
 
             <TextView
-                android:id="@+id/profileTextEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
@@ -140,23 +228,67 @@
                 android:textSize="14sp"
                 android:textStyle="italic" />
 
-            <AutoCompleteTextView
-                android:id="@+id/profileCompleteEmail"
+            <TextView
+                android:id="@+id/profileTextViewEmail"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-
                 android:background="#A4FFFFFF"
                 android:backgroundTint="#2FFFFEFE"
+                android:clickable="true"
                 android:ems="10"
                 android:fontFamily="sans-serif-medium"
                 android:inputType="text"
                 android:minHeight="48dp"
                 android:padding="10dp"
                 android:text="email"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/LayoutEditEmail"
+                android:layout_width="300dp"
+                android:layout_height="55dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <AutoCompleteTextView
+                    android:id="@+id/autoCompleteTextViewEmail"
+                    android:layout_width="278dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1"
+                    android:background="#A4FFFFFF"
+                    android:backgroundTint="#2FFFFEFE"
+                    android:ems="10"
+                    android:fontFamily="sans-serif-medium"
+                    android:inputType="text"
+                    android:minHeight="48dp"
+                    android:padding="5dp"
+                    android:text="email"
+                    android:textSize="16sp"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <ImageView
+                    android:id="@+id/buttonEditEmail"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/edit" />
+
+
+            </LinearLayout>
+
 
 
             <LinearLayout
@@ -176,7 +308,7 @@
                     android:layout_weight="1"
                     android:backgroundTint="#050505"
                     android:fontFamily="sans-serif-black"
-                    android:text="Edit"
+                    android:text="Password????"
                     android:textColor="@color/white"
                     android:textColorHighlight="#000000"
                     android:textColorLink="#000000"
