@@ -1,5 +1,6 @@
 package com.example.eduscan;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,9 +30,23 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
         return new ViewHolder(view);
     }
 
+//    @Override
+//    public void onBindViewHolder(@NonNull RecycleAdapter.ViewHolder holder, int position) {
+//        holder.imageView.setImageURI(uriArrayList.get(position));
+//    }
+
     @Override
-    public void onBindViewHolder(@NonNull RecycleAdapter.ViewHolder holder, int position) {
-        holder.imageView.setImageURI(uriArrayList.get(position));
+    public void onBindViewHolder(@NonNull RecycleAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+        Uri imageUri = uriArrayList.get(position);
+        holder.imageView.setImageURI(imageUri);
+        holder.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // Apelăm metoda pentru ștergerea imaginii atunci când se face long click
+                deleteImage(position);
+                return true;
+            }
+        });
     }
 
     @Override
@@ -49,5 +64,11 @@ public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.ViewHold
             imageView = itemView.findViewById(R.id.image);
         }
 
+    }
+
+    // Metodă pentru ștergerea unei imagini din listă
+    private void deleteImage(int position) {
+        uriArrayList.remove(position);
+        notifyItemRemoved(position);
     }
 }

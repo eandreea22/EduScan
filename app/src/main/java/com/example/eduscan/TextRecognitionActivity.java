@@ -552,31 +552,6 @@ public class TextRecognitionActivity extends AppCompatActivity {
     }
 
 
-    //create + save in files
-//        try {
-//            ContentValues values = new ContentValues();
-//            values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
-//            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
-//            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-//
-//            Uri uri = getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
-//
-//            if (uri != null) {
-//                OutputStream outputStream = getContentResolver().openOutputStream(uri);
-//
-//                PdfWriter writer = new PdfWriter(outputStream);
-//                PdfDocument pdf = new PdfDocument(writer);
-//                Document document = new Document(pdf);
-//                document.add(new Paragraph(recognizedText));
-//                document.close();
-//
-//                progressDialog.dismiss();
-//                Toast.makeText(TextRecognitionActivity.this, "PDF saved to Downloads", Toast.LENGTH_LONG).show();
-//            }
-//        } catch (Exception e) {
-//            Toast.makeText(TextRecognitionActivity.this, "Failed to save PDF", Toast.LENGTH_SHORT).show();
-//
-//        }
 
     private void saveTextAsPDF(String recognizedText, String filename) {
 

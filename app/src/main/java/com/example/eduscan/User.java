@@ -25,6 +25,9 @@ public class User {
         this.files = new ArrayList<FileModel>();
     }
 
+    public User(String name, String email, String password) {
+    }
+
     public String getName() {
         return name;
     }

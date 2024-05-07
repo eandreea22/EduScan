@@ -8,32 +8,29 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DatabaseError;
 
-import org.xml.sax.DTDHandler;
-
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class FilesActivity extends AppCompatActivity implements FileAdapter.SelectionChangeListener{
 
@@ -52,6 +49,13 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
     private View.OnClickListener editFileClickListener;
     private View.OnTouchListener editFileTouchListener;
 
+    //
+    private ImageView pdfImageView;
+    private PdfRenderer pdfRenderer;
+    private PdfRenderer.Page currentPage;
+    private ParcelFileDescriptor parcelFileDescriptor;
+    private Button prevButton;
+    private Button nextButton;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -245,12 +249,16 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
             }
         };
 
-        viewFileClickListener = new View.OnClickListener() {
+
+        //nu mi iese
+        viewFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Acțiunea care trebuie luată atunci când viewFile este apăsat
+
+
+
             }
-        };
+        });
 
 
 
@@ -276,6 +284,7 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
             }
 
         });
+
 
         deleteFile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -306,11 +315,15 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                     @Override
                     public void onFailure(String errorMessage) {
                         Toast.makeText(FilesActivity.this, "error storage", Toast.LENGTH_SHORT).show();
+
                     }
                 });
             }
         });
 
+
+
+        //nu merge
         shareFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

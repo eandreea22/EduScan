@@ -137,16 +137,12 @@ public class DatabaseConnection {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
 
-                    // Verifică fiecare subnod pentru a găsi adresa de email
-                    String userEmail = userSnapshot.child("email").getValue(String.class);
 
                         // Dacă adresa de email este găsită, folosește credențialele pentru autentificare
                         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                                 .addOnCompleteListener(task -> {
                                     if (task.isSuccessful()) {
 
-//                                        user.setEmail(email);
-//                                        user.setPassword(password);
 
                                         // Autentificarea a reușit, obțineți utilizatorul curent
                                         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -166,8 +162,6 @@ public class DatabaseConnection {
                                                             String name = userSnapshot.child("name").getValue(String.class);
                                                             String username = userSnapshot.child("username").getValue(String.class);
 
-//                                                            user.setName(name);
-//                                                            user.setUsername(username);
 
                                                             user = new User(name, username, email, password);
                                                             user.setId(userId);
@@ -190,7 +184,7 @@ public class DatabaseConnection {
                                         }
                                     } else {
                                         // Autentificarea a eșuat, tratați această situație corespunzător
-                                        listener.onUserSaveFailed("Authentication failed: " + task.getException().getMessage());
+                                        listener.onUserSaveFailed("Please enter the correct email and password ");
                                     }
                                 });
                         // Întrerupeți bucla după ce ați găsit adresa de email
@@ -206,6 +200,8 @@ public class DatabaseConnection {
             }
         });
     }
+
+
 
 
     public interface UserSaveListener {
@@ -483,34 +479,6 @@ public class DatabaseConnection {
     }
 
 
-
-    public void downloadFile(Context context, String fileName, DatabaseActionListener listener){
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-
-        // Creează o referință către fișierul dorit
-        StorageReference storageRef = storage.getReference().child("files/" + fileName );
-
-        // Creează un obiect File pentru a reprezenta locația în care va fi salvat fișierul
-        File localFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName + ".pdf");
-
-
-        // Descarcă fișierul din Firebase Storage
-        storageRef.getFile(localFile)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // Descărcarea a fost realizată cu succes
-                    Log.d(TAG, "Download successful: " + localFile.getPath());
-                    // Acum poți folosi fișierul local pentru ce ai nevoie
-                    listener.onSuccess();
-                })
-                .addOnFailureListener(exception -> {
-                    // Descărcarea a eșuat
-                    Log.e(TAG, "Download failed: " + exception.getMessage());
-                    listener.onFailure("Download failed");
-                });
-
-    }
-
     public void downloadFiles(Context context, ArrayList<String> fileNames, DatabaseActionListener listener) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         AtomicInteger filesDownloaded = new AtomicInteger(0);
@@ -518,7 +486,7 @@ public class DatabaseConnection {
 
         for (String fileName : fileNames) {
             StorageReference storageRef = storage.getReference().child("files/" + fileName);
-            File localFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileName + ".pdf");
+            File localFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName + ".pdf");
 
             storageRef.getFile(localFile)
                     .addOnSuccessListener(taskSnapshot -> {

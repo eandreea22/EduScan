@@ -1,3 +1,7 @@
+import org.gradle.internal.impldep.bsh.commands.dir
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.include
+import java.util.regex.Pattern.compile
+
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
@@ -41,13 +45,21 @@ android {
     }
 }
 
+
 dependencies {
 
     //text-recognition ml lib
     implementation ("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
 
     //pdf
-    implementation("com.itextpdf:itext7-core:7.1.9");
+    implementation("com.itextpdf:itext7-core:7.1.9")
+
+    // Dependency on view binding
+    implementation ("androidx.databinding:viewbinding:7.1.2")
+    // Dependency on navigation fragments
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.2.2")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.2.2")
+
 
     //
     //implementation("com.quickbirdstudios:opencv-contrib:4.5.3.0")
