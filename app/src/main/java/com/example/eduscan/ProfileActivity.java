@@ -29,17 +29,15 @@ public class ProfileActivity extends AppCompatActivity {
 
     //
     TextView profileTextViewName;
-    TextView profileTextViewUsername;
     TextView profileTextViewEmail;
 
     //
     LinearLayout LayoutEditName;
-    LinearLayout LayoutEditUsername;
     LinearLayout LayoutEditEmail;
 
     //
     AutoCompleteTextView autoCompleteTextViewName;
-    AutoCompleteTextView autoCompleteTextViewUsername;
+
     AutoCompleteTextView autoCompleteTextViewEmail;
 
     //
@@ -48,14 +46,9 @@ public class ProfileActivity extends AppCompatActivity {
 
     //
     ImageView buttonEditName;
-    ImageView buttonEditUsername;
+
     ImageView buttonEditEmail;
 
-
-    //de sters
-    AutoCompleteTextView profileCompleteName;
-    AutoCompleteTextView profileCompleteUsername;
-    AutoCompleteTextView profileCompleteEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
