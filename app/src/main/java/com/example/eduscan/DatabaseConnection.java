@@ -160,10 +160,8 @@ public class DatabaseConnection {
                                                         for (DataSnapshot userSnapshot : snapshot.getChildren()){
                                                             String userId = userSnapshot.getKey();
                                                             String name = userSnapshot.child("name").getValue(String.class);
-                                                            String username = userSnapshot.child("username").getValue(String.class);
 
-
-                                                            user = new User(name, username, email, password);
+                                                            user = new User(name, email, password);
                                                             user.setId(userId);
                                                         }
                                                     }
@@ -220,16 +218,6 @@ public class DatabaseConnection {
                 .addOnFailureListener(e -> listener.onUpdateFailure(e.getMessage()));
     }
 
-    public void changeUsername(String newUsername, DatabaseUpdateListener listener){
-
-        user.setUsername(newUsername);
-
-        DatabaseReference reference = database.getReference("users");
-        reference.child(user.getId()).child("username").setValue(newUsername)
-                .addOnSuccessListener(aVoid -> listener.onUpdateSuccess())
-                .addOnFailureListener(e -> listener.onUpdateFailure(e.getMessage()));
-
-    }
 
     public void changeEmail(String newEmail, DatabaseUpdateListener listener){
 

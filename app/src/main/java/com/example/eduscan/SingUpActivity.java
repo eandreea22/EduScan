@@ -27,7 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class SingUpActivity extends AppCompatActivity {
 
-    EditText signUpName, signUpUsername, signUpEmail, signUpPassword;
+    EditText signUpName, signUpEmail, signUpPassword;
     Button buttonSignUp;
 
     TextView loginRedirect;
@@ -39,7 +39,7 @@ public class SingUpActivity extends AppCompatActivity {
 
 
         signUpName = findViewById(R.id.signUpName);
-        signUpUsername = findViewById(R.id.signUpUsername);
+
         signUpEmail = findViewById(R.id.signUpEmail);
         signUpPassword = findViewById(R.id.signUpPassword);
 
@@ -58,15 +58,11 @@ public class SingUpActivity extends AppCompatActivity {
 
 
                 String name = signUpName.getText().toString();
-                String username = signUpUsername.getText().toString();
                 String email = signUpEmail.getText().toString();
                 String password = signUpPassword.getText().toString();
 
 
-                if (username.isEmpty()){
-                    Toast.makeText(SingUpActivity.this, "Please enter a username!", Toast.LENGTH_SHORT).show();
-
-                }else if (password.isEmpty()){
+                if (password.isEmpty()){
                     Toast.makeText(SingUpActivity.this, "Please enter a password!", Toast.LENGTH_SHORT).show();
 
                 }else if(name.isEmpty()){
@@ -84,26 +80,22 @@ public class SingUpActivity extends AppCompatActivity {
                 } else {
 
                     // verif if username exists
-                    LiveData<Boolean> usernameExists = DatabaseConnection.getInstance().checkUsername(username);
+                    LiveData<Boolean> usernameExists = DatabaseConnection.getInstance().checkUsername(email);
 
                     usernameExists.observe(SingUpActivity.this, result -> {
 
                         if (result){
-                            Toast.makeText(SingUpActivity.this, "Username already exists!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SingUpActivity.this, "Email already exists!", Toast.LENGTH_SHORT).show();
 
                         }else {
 
                             // add user
                             User user = new User();
-                            user.setUsername(username);
                             user.setName(name);
                             user.setEmail(email);
                             user.setPassword(password);
 
                             DatabaseConnection.getInstance().addUser(user);
-
-//                                startActivity(new Intent(SingUpActivity.this, PopUpNewAccount.class));
-
 
                             Intent intent = new Intent(SingUpActivity.this, LoginActivity.class);
                             startActivity(intent);

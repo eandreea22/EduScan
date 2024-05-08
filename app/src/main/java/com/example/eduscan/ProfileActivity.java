@@ -69,27 +69,21 @@ public class ProfileActivity extends AppCompatActivity {
 
         // init
         profileTextViewName = findViewById(R.id.profileTextViewName);
-        profileTextViewUsername = findViewById(R.id.profileTextViewUsername);
         profileTextViewEmail = findViewById(R.id.profileTextViewEmail);
 
         profileTextViewName.setText(DatabaseConnection.getInstance().getUser().getName());
-        profileTextViewUsername.setText(DatabaseConnection.getInstance().getUser().getUsername());
         profileTextViewEmail.setText(DatabaseConnection.getInstance().getUser().getEmail());
 
         LayoutEditName = findViewById(R.id.LayoutEditName);
-        LayoutEditUsername = findViewById(R.id.LayoutEditUsername);
         LayoutEditEmail = findViewById(R.id.LayoutEditEmail);
 
         autoCompleteTextViewName = findViewById(R.id.autoCompleteTextViewName);
-        autoCompleteTextViewUsername = findViewById(R.id.autoCompleteTextViewUsername);
         autoCompleteTextViewEmail = findViewById(R.id.autoCompleteTextViewEmail);
 
         autoCompleteTextViewName.setText(DatabaseConnection.getInstance().getUser().getName());
-        autoCompleteTextViewUsername.setText(DatabaseConnection.getInstance().getUser().getUsername());
         autoCompleteTextViewEmail.setText(DatabaseConnection.getInstance().getUser().getEmail());
 
         buttonEditName = findViewById(R.id.buttonEditName);
-        buttonEditUsername = findViewById(R.id.buttonEditUsername);
         buttonEditEmail = findViewById(R.id.buttonEditEmail);
 
 
@@ -147,76 +141,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        profileTextViewUsername.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LayoutEditUsername.setVisibility(View.VISIBLE);
-                profileTextViewUsername.setVisibility(View.GONE);
-
-                buttonEditUsername.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        String newUsername = autoCompleteTextViewUsername.getText().toString().trim();
-
-                        if (!newUsername.isEmpty() && !newUsername.equals(DatabaseConnection.getInstance().getUser().getUsername()) && isValidUsername(newUsername)) {
-
-                            // verif if username exists
-                            LiveData<Boolean> usernameExists = DatabaseConnection.getInstance().checkUsername(newUsername);
-
-                            usernameExists.observe(ProfileActivity.this, result -> {
-
-                                if (result){
-                                    Toast.makeText(ProfileActivity.this, "Username already exists!", Toast.LENGTH_SHORT).show();
-
-                                }else {
-
-                                    // change username
-                                    DatabaseConnection.getInstance().changeUsername(newUsername, new DatabaseUpdateListener() {
-                                        @Override
-                                        public void onUpdateSuccess() {
-                                            runOnUiThread(() -> {
-                                                profileTextViewUsername.setText(newUsername);
-                                                autoCompleteTextViewUsername.setText(newUsername);
-
-                                                LayoutEditUsername.setVisibility(View.GONE);
-                                                profileTextViewUsername.setVisibility(View.VISIBLE);
-
-                                                Toast.makeText(ProfileActivity.this, "Updated successfully!", Toast.LENGTH_SHORT).show();
-
-                                            });
-                                        }
-
-                                        @Override
-                                        public void onUpdateFailure(String errorMessage) {
-                                            runOnUiThread(() -> {
-
-                                                LayoutEditUsername.setVisibility(View.GONE);
-                                                profileTextViewUsername.setVisibility(View.VISIBLE);
-
-                                                Toast.makeText(ProfileActivity.this, "Failed to update username", Toast.LENGTH_SHORT).show();
-
-                                            });
-                                        }
-                                    });
-
-                                }
-
-                            });
-
-
-
-                        }else {
-                            LayoutEditUsername.setVisibility(View.GONE);
-                            profileTextViewUsername.setVisibility(View.VISIBLE);
-
-                            Toast.makeText(ProfileActivity.this, "Not a valid username!", Toast.LENGTH_SHORT).show();
-
-                        }
-                    }
-                });
-            }
-        });
 
         profileTextViewEmail.setOnClickListener(new View.OnClickListener() {
             @Override
