@@ -42,7 +42,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     //
     Button profileButtonBack;
-    Button profileButtonEdit;
+    TextView changePassword;
 
     //
     ImageView buttonEditName;
@@ -57,8 +57,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
         profileButtonBack = findViewById(R.id.profileButtonBack);
-        profileButtonEdit = findViewById(R.id.profileButtonEdit);
-
+        changePassword = findViewById(R.id.changePassword);
 
         // init
         profileTextViewName = findViewById(R.id.profileTextViewName);
@@ -204,16 +203,18 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        changePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProfileActivity.this, ChangePasswordActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 
     private boolean isValidEmail(CharSequence email) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
-
-    private boolean isValidUsername(CharSequence username) {
-        return username.toString().matches("^[a-zA-Z0-9_.]{3,16}$");
-    }
-
 
 }
