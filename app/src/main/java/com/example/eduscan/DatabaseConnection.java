@@ -229,6 +229,16 @@ public class DatabaseConnection {
                 .addOnFailureListener(e -> listener.onUpdateFailure(e.getMessage()));
     }
 
+    public void changePassword(String newPassword, DatabaseUpdateListener listener){
+
+        user.setPassword(newPassword);
+
+        DatabaseReference reference = database.getReference("users");
+        reference.child(user.getId()).child("password").setValue(newPassword)
+                .addOnSuccessListener(aVoid -> listener.onUpdateSuccess())
+                .addOnFailureListener(e -> listener.onUpdateFailure(e.getMessage()));
+    }
+
 
     public interface PdfUploadListener {
         void onPdfUploadedSuccess();

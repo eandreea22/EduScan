@@ -54,9 +54,6 @@ public class SingUpActivity extends AppCompatActivity {
             public void onClick(View view) {
 
 
-//              startActivity(new Intent(SingUpActivity.this, PopUpNewAccount.class));
-
-
                 String name = signUpName.getText().toString();
                 String email = signUpEmail.getText().toString();
                 String password = signUpPassword.getText().toString();

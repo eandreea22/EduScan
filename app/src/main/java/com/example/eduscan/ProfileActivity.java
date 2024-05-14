@@ -92,7 +92,7 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
-                        if (!newName.isEmpty() && !newName.equals(DatabaseConnection.getInstance().getUser().getName())){
+                        if (!newName.isEmpty() && !newName.equals(DatabaseConnection.getInstance().getUser().getName().trim())){
 
                             DatabaseConnection.getInstance().changeName(newName, new DatabaseUpdateListener() {
                                 @Override
@@ -121,6 +121,10 @@ public class ProfileActivity extends AppCompatActivity {
                             });
 
 
+                        }else if(newName.equals(DatabaseConnection.getInstance().getUser().getName().trim())) {
+                            LayoutEditName.setVisibility(View.GONE);
+                            profileTextViewName.setVisibility(View.VISIBLE);
+                            Toast.makeText(ProfileActivity.this, "Nothing changed", Toast.LENGTH_SHORT).show();
                         }else {
                             LayoutEditName.setVisibility(View.GONE);
                             profileTextViewName.setVisibility(View.VISIBLE);
@@ -156,8 +160,6 @@ public class ProfileActivity extends AppCompatActivity {
 
                                         LayoutEditEmail.setVisibility(View.GONE);
                                         profileTextViewEmail.setVisibility(View.VISIBLE);
-
-
                                         Toast.makeText(ProfileActivity.this, "Updated successfully!", Toast.LENGTH_SHORT).show();
 
                                     });
@@ -169,7 +171,6 @@ public class ProfileActivity extends AppCompatActivity {
 
                                         LayoutEditEmail.setVisibility(View.GONE);
                                         profileTextViewEmail.setVisibility(View.VISIBLE);
-
                                         Toast.makeText(ProfileActivity.this, "Failed to update email", Toast.LENGTH_SHORT).show();
 
                                     });
@@ -177,13 +178,14 @@ public class ProfileActivity extends AppCompatActivity {
                             });
 
 
-                        }else {
-
+                        } else if (newEmail.equals(DatabaseConnection.getInstance().getUser().getEmail())) {
                             LayoutEditEmail.setVisibility(View.GONE);
                             profileTextViewEmail.setVisibility(View.VISIBLE);
-
+                            Toast.makeText(ProfileActivity.this, "Nothing changed", Toast.LENGTH_SHORT).show();
+                        } else {
+                            LayoutEditEmail.setVisibility(View.GONE);
+                            profileTextViewEmail.setVisibility(View.VISIBLE);
                             Toast.makeText(ProfileActivity.this, "Not a valid email!", Toast.LENGTH_SHORT).show();
-
                         }
 
 

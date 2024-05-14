@@ -187,7 +187,7 @@ public class TextRecognitionActivity extends AppCompatActivity {
                 if (uriArrayList == null){
                     Toast.makeText(TextRecognitionActivity.this, "Pick image first..", Toast.LENGTH_SHORT).show();
                 }else {
-                    showSaveOptionsDialog();
+                    showFileNameDialog();
                 }
             }
         });
@@ -409,36 +409,8 @@ public class TextRecognitionActivity extends AppCompatActivity {
 
 
     ////////////////////////////////
-    enum SaveFormat {
-        PDF,
-        WORD
-    }
 
-
-
-    // recognize text from image
-    private void showSaveOptionsDialog() {
-        final String[] saveOptions = {"Save as PDF", "Save as Word Document"};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(TextRecognitionActivity.this);
-        builder.setTitle("Choose save format");
-
-        builder.setItems(saveOptions, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                SaveFormat selectedFormat = (which == 0) ? SaveFormat.PDF : SaveFormat.WORD;
-                // Lansează dialogul pentru numele fișierului după ce se alege formatul
-                showFileNameDialog(selectedFormat);
-            }
-        });
-
-        builder.setNegativeButton("Cancel", null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-
-    private void showFileNameDialog(SaveFormat format) {
+    private void showFileNameDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("File Name");
 
@@ -453,7 +425,7 @@ public class TextRecognitionActivity extends AppCompatActivity {
                 if (!fileName.isEmpty()) {
                     progressDialog.setMessage("Recognizing text..");
                     progressDialog.show();
-                    recognizeTextFromImages(uriArrayList, format, fileName);
+                    recognizeTextFromImages(uriArrayList, fileName);
                 } else {
                     Toast.makeText(TextRecognitionActivity.this, "File name cannot be empty", Toast.LENGTH_SHORT).show();
                 }
@@ -469,13 +441,13 @@ public class TextRecognitionActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void recognizeTextFromImages(ArrayList<Uri> uriArrayList, SaveFormat format, String fileName) {
+    private void recognizeTextFromImages(ArrayList<Uri> uriArrayList, String fileName) {
         for (Uri imgUri : uriArrayList) {
-            recognizeTextFromImage(imgUri, format, fileName);
+            recognizeTextFromImage(imgUri, fileName);
         }
     }
 
-    private void recognizeTextFromImage(Uri imgUri, SaveFormat format, String fileName) {
+    private void recognizeTextFromImage(Uri imgUri, String fileName) {
         try {
             InputImage inputImage = InputImage.fromFilePath(this, imgUri);
 
@@ -483,7 +455,7 @@ public class TextRecognitionActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Text>() {
                         @Override
                         public void onSuccess(Text text) {
-                            updateRecognizedText(text, format, fileName, imgUri);
+                            updateRecognizedText(text, fileName, imgUri);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -499,63 +471,16 @@ public class TextRecognitionActivity extends AppCompatActivity {
         }
     }
 
-    private void updateRecognizedText(Text text, SaveFormat format, String fileName, Uri imgUri) {
+    private void updateRecognizedText(Text text, String fileName, Uri imgUri) {
         recognizedTextBuilder.append(text.getText());
         if (imgUri.equals(uriArrayList.get(uriArrayList.size() - 1))) {
-            saveText(format, fileName);
+            String recognizedText = recognizedTextBuilder.toString();
+            saveTextAsPDF(recognizedText, fileName);
         }
     }
-
-    private void saveText(SaveFormat format, String filename) {
-        String recognizedText = recognizedTextBuilder.toString();
-        switch (format) {
-            case PDF:
-                saveTextAsPDF(recognizedText, filename);
-                break;
-            case WORD:
-                saveTextAsWord(recognizedText, filename);
-                break;
-        }
-    }
-
-
-
-    // save as pdf / word
-    private void saveTextAsWord(String recognizedText, String filename) {
-
-        //create + save in files
-        try {
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.MediaColumns.DISPLAY_NAME, filename);
-            values.put(MediaStore.MediaColumns.MIME_TYPE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-
-            Uri uri = getContentResolver().insert(MediaStore.Files.getContentUri("external"), values);
-
-            if (uri != null) {
-                OutputStream outputStream = getContentResolver().openOutputStream(uri);
-
-                // Aici creezi documentul Word folosind biblioteca aleasă
-                // Exemplu simplificat cu docx4j (trebuie adaptat la biblioteca ta):
-
-                WordprocessingMLPackage wordPackage = WordprocessingMLPackage.createPackage();
-                MainDocumentPart mainDocumentPart = wordPackage.getMainDocumentPart();
-                mainDocumentPart.addParagraphOfText(recognizedText);
-                wordPackage.save(outputStream);
-
-
-                Toast.makeText(TextRecognitionActivity.this, "Word document saved to Downloads", Toast.LENGTH_LONG).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(TextRecognitionActivity.this, "Failed to save Word document", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
 
     private void saveTextAsPDF(String recognizedText, String filename) {
-
-
 
         //firebase
         // Convertiți textul recunoscut într-un șir de octeți
@@ -611,9 +536,6 @@ public class TextRecognitionActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Utilizatorul nu este autentificat.", Toast.LENGTH_SHORT).show();
 
         }
-
-
-
 
 
     }
