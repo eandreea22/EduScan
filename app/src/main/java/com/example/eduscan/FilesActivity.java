@@ -50,6 +50,12 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
     private View.OnTouchListener editFileTouchListener;
 
     //
+    private ImageView pdfImageView;
+    private PdfRenderer pdfRenderer;
+    private PdfRenderer.Page currentPage;
+    private ParcelFileDescriptor parcelFileDescriptor;
+    private Button prevButton;
+    private Button nextButton;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -249,19 +255,7 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
             @Override
             public void onClick(View v) {
 
-                DatabaseConnection.getInstance().getUrlForMultipleFiles(fileAdapter.getSelectedFiles(), new DatabaseConnection.MultipleFileUrlListener() {
-                    @Override
-                    public void onMultipleFileUrlsReceived(ArrayList<String> fileUrisFromDatabase) {
-                        if (fileUrisFromDatabase.size() > 0) {
-                            String pdfUrl = fileUrisFromDatabase.get(0);
-                            Intent intent = new Intent(FilesActivity.this, PdfViewerActivity.class);
-                            intent.putExtra("pdfUrl", pdfUrl);
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(FilesActivity.this, "Failed to get file URL", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+
 
             }
         });
@@ -375,7 +369,6 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                 // Dezactivează click-ul pe imaginile editFile și viewFile
                 editFile.setOnClickListener(null);
                 viewFile.setOnClickListener(null);
-                //
                 editFile.setOnTouchListener(null);
                 viewFile.setOnTouchListener(null);
 
@@ -386,7 +379,7 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                 // Re-activează click-ul pe imaginile editFile și viewFile
                 editFile.setOnClickListener(editFileClickListener);
                 viewFile.setOnClickListener(viewFileClickListener);
-                //
+
                 editFile.setOnTouchListener(editFileTouchListener);
                 viewFile.setOnTouchListener(viewFileTouchListener);
             }
