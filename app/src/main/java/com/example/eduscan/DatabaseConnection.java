@@ -424,7 +424,7 @@ public class DatabaseConnection {
         // Obține referința către fișierul vechi din Firebase Storage
         StorageReference oldFileRef = FirebaseStorage.getInstance().getReference()
                 .child("files/")
-                .child(oldName + ".pdf");
+                .child(oldName);
 
         // Descarcă fișierul vechi într-un fișier temporar pe dispozitivul local
         File localFile;

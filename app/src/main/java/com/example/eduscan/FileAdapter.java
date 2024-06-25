@@ -43,6 +43,9 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
 
         FileModel file = fileList.get(position);
         holder.fileNameTextView.setText(file.getFileName());
+
+        holder.fileCheckBox.setOnCheckedChangeListener(null);
+
         holder.fileCheckBox.setChecked(selectedFiles.contains(file.getFileName()));
 
         // Ascultător pentru selectarea/deselectarea fișierului
@@ -54,7 +57,6 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             }
             listener.onSelectionChanged(selectedFiles.size());
         });
-
     }
 
     @Override
@@ -62,11 +64,16 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         return fileList.size();
     }
 
+    public void clearSelection() {
+        selectedFiles.clear();
+        notifyDataSetChanged();
+    }
 
     // Returnează fișierele selectate
     public ArrayList<String> getSelectedFiles() {
         return selectedFiles;
     }
+
     public void updateFiles(ArrayList<FileModel> fileList) {
         this.fileList = fileList;
         notifyDataSetChanged();

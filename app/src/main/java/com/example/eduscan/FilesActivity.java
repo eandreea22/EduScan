@@ -8,6 +8,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+
+import android.graphics.Bitmap;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,7 +19,6 @@ import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -28,7 +29,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DatabaseError;
 
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -54,8 +57,6 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
     private PdfRenderer pdfRenderer;
     private PdfRenderer.Page currentPage;
     private ParcelFileDescriptor parcelFileDescriptor;
-    private Button prevButton;
-    private Button nextButton;
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -172,15 +173,12 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
         editFileClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                // Afișează un dialog de progres pentru a întreba utilizatorul
                 ProgressDialog progressDialog = new ProgressDialog(FilesActivity.this);
                 progressDialog.setTitle("Rename File");
                 progressDialog.setMessage("Do you want to rename this file?");
                 progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Afișează un dialog de introducere a textului pentru a introduce noul nume al fișierului
                         AlertDialog.Builder builder = new AlertDialog.Builder(FilesActivity.this);
                         builder.setTitle("Enter New Name");
                         final EditText input = new EditText(FilesActivity.this);
@@ -189,45 +187,32 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String newName = input.getText().toString();
-
-                                // Actualizează numele fișierului în ArrayList - User
-
                                 String fileName = fileAdapter.getSelectedFiles().get(0);
                                 DatabaseConnection.getInstance().getUser().editFileName(fileName, newName);
-
-                                fileAdapter.updateFiles(DatabaseConnection.getInstance().getUser().getFiles());
-                                fileAdapter.notifyDataSetChanged();
-
-
-                                // Actualizează numele fișierului în Firebase Realtime Database și Firebase Storage
                                 DatabaseConnection.getInstance().editFileNameStorage(fileName, newName, new DatabaseConnection.DatabaseActionListener() {
-
                                     @Override
-                                    public void onSuccess(){
-
+                                    public void onSuccess() {
                                         DatabaseConnection.getInstance().editFileNameRealtime(fileName, newName, new DatabaseConnection.DatabaseActionListener() {
                                             @Override
                                             public void onSuccess() {
+                                                fileAdapter.updateFiles(DatabaseConnection.getInstance().getUser().getFiles());
                                                 Toast.makeText(FilesActivity.this, "Done", Toast.LENGTH_SHORT).show();
+                                                fileAdapter.clearSelection();
+                                                onSelectionChanged(0);
                                             }
 
                                             @Override
                                             public void onFailure(String errorMessage) {
-                                                Toast.makeText(FilesActivity.this, "error 1 ", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(FilesActivity.this, "error 1", Toast.LENGTH_SHORT).show();
                                             }
                                         });
-
                                     }
 
                                     @Override
                                     public void onFailure(String errorMessage) {
-                                        // Operația în Realtime Database a eșuat
-                                        // Afișează sau gestionează mesajul de eroare
-                                        Toast.makeText(FilesActivity.this, "error ", Toast.LENGTH_SHORT).show();
-
+                                        Toast.makeText(FilesActivity.this, "error", Toast.LENGTH_SHORT).show();
                                     }
                                 });
-
                             }
                         });
                         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -251,14 +236,56 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
 
 
         //nu mi iese
-        viewFile.setOnClickListener(new View.OnClickListener() {
+        viewFileClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setContentView(R.layout.pdf_viewer);
+                pdfImageView = findViewById(R.id.pdfImageView);
 
+                DatabaseConnection.getInstance().downloadFiles(FilesActivity.this, fileAdapter.getSelectedFiles(), new DatabaseConnection.DatabaseActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        // Called when all files are successfully downloaded
+                        // Now you can open PdfRenderer to display the PDF
+                        File localFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileAdapter.getSelectedFiles().get(0));
 
+                        try {
+                            parcelFileDescriptor = ParcelFileDescriptor.open(localFile, ParcelFileDescriptor.MODE_READ_ONLY);
+                            if (parcelFileDescriptor != null) {
+                                pdfRenderer = new PdfRenderer(parcelFileDescriptor);
+                                displayPage(0); // Display the first page initially
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
 
+                    @Override
+                    public void onFailure(String errorMessage) {
+                        // Handle failure to download files
+                    }
+                });
             }
-        });
+
+            private void displayPage(int pageIndex) {
+                if (pdfRenderer.getPageCount() <= pageIndex) {
+                    return;
+                }
+
+                if (currentPage != null) {
+                    currentPage.close();
+                }
+
+                currentPage = pdfRenderer.openPage(pageIndex);
+
+                Bitmap bitmap = Bitmap.createBitmap(currentPage.getWidth(), currentPage.getHeight(), Bitmap.Config.ARGB_8888);
+                currentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+
+                pdfImageView.setImageBitmap(bitmap);
+            }
+        };
+
+
 
 
 
@@ -270,6 +297,8 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                     public void onSuccess() {
                         // Acțiuni în caz de succes
                         Toast.makeText(FilesActivity.this, "Download successful", Toast.LENGTH_SHORT).show();
+                        fileAdapter.clearSelection();
+                        onSelectionChanged(0);
                     }
 
                     @Override
@@ -303,6 +332,10 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                                 fileAdapter.notifyDataSetChanged();
 
                                 Toast.makeText(FilesActivity.this, "Deleted successful", Toast.LENGTH_SHORT).show();
+
+                                fileAdapter.clearSelection();
+                                onSelectionChanged(0);
+
                             }
 
                             @Override
@@ -361,7 +394,7 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
     public void onSelectionChanged(int numSelected) {
 
         // Verifică numărul de fișiere selectate și actualizează opacitatea icoanei în consecință
-        if (fileAdapter.getItemCount() != 1){
+        if (fileAdapter.getItemCount() != 0){
             if (numSelected > 1) {
                 editFile.setAlpha(0.5f); // Setează opacitatea la jumătate
                 viewFile.setAlpha(0.5f);
@@ -369,6 +402,7 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                 // Dezactivează click-ul pe imaginile editFile și viewFile
                 editFile.setOnClickListener(null);
                 viewFile.setOnClickListener(null);
+
                 editFile.setOnTouchListener(null);
                 viewFile.setOnTouchListener(null);
 
@@ -386,4 +420,7 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
         }
 
     }
+
+
+
 }
