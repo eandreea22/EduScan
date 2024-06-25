@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView goToProfile;
     Button buttonScan;
     Button buttonFiles;
+    Button buttonGuide;
 
 
     @Override
@@ -20,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        buttonGuide = findViewById(R.id.buttonGuide);
 
         goToProfile = findViewById(R.id.goToProfile);
 
@@ -47,6 +50,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, FilesActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        buttonGuide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, GuideActivity.class);
                 startActivity(intent);
             }
         });
