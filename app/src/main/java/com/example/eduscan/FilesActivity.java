@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
@@ -24,6 +26,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import android.Manifest;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -66,6 +71,8 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
         setContentView(R.layout.activity_files);
 
         //
+        checkAndRequestPermissions();
+
 
         //
         goToProfile = findViewById(R.id.goToProfile);
@@ -100,6 +107,9 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
             }
         });
 
+
+
+
         goToProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,6 +117,8 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                 startActivity(intent);
             }
         });
+
+
 
 
         //
@@ -247,24 +259,35 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                     public void onSuccess() {
                         // Called when all files are successfully downloaded
                         // Now you can open PdfRenderer to display the PDF
-                        File localFile = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), fileAdapter.getSelectedFiles().get(0));
+                        // Obține calea către directorul public de descărcări
+                        File downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                        File localFile = new File(downloadDirectory, fileAdapter.getSelectedFiles().get(0)+ ".pdf");
 
-                        try {
-                            parcelFileDescriptor = ParcelFileDescriptor.open(localFile, ParcelFileDescriptor.MODE_READ_ONLY);
-                            if (parcelFileDescriptor != null) {
-                                pdfRenderer = new PdfRenderer(parcelFileDescriptor);
-                                displayPage(0); // Display the first page initially
+                        Log.d("PDF_VIEWER", "File path: " + localFile.getAbsolutePath());
+
+                        if (localFile.exists()) {
+                            Log.d("PDF_VIEWER", "File exists");
+                            try {
+                                parcelFileDescriptor = ParcelFileDescriptor.open(localFile, ParcelFileDescriptor.MODE_READ_ONLY);
+                                if (parcelFileDescriptor != null) {
+                                    pdfRenderer = new PdfRenderer(parcelFileDescriptor);
+                                    displayPage(0); // Display the first page initially
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } else {
+                            Log.d("PDF_VIEWER", "File does not exist");
                         }
                     }
 
                     @Override
                     public void onFailure(String errorMessage) {
                         // Handle failure to download files
+                        Log.d("PDF_VIEWER", "Download failed: " + errorMessage);
                     }
                 });
+
             }
 
             private void displayPage(int pageIndex) {
@@ -421,6 +444,29 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
 
     }
 
+    private void checkAndRequestPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permisiunea a fost acordată
+            } else {
+                // Permisiunea a fost refuzată, ar trebui să informezi utilizatorul
+                Toast.makeText(this, "Permisiunea este necesară pentru a descărca și vizualiza fișiere.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
 }
