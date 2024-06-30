@@ -513,7 +513,7 @@ public class TextRecognitionActivity extends AppCompatActivity {
                                 @Override
                                 public void onPdfUploadedSuccess() {
                                     // PDF-ul a fost salvat cu succes în baza de date
-                                    Toast.makeText(getApplicationContext(), "PDF-ul a fost salvat cu succes în baza de date.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "The PDF has been successfully saved to the database.", Toast.LENGTH_SHORT).show();
                                 }
 
                                 @Override
@@ -533,7 +533,7 @@ public class TextRecognitionActivity extends AppCompatActivity {
                     });
 
         }else {
-            Toast.makeText(getApplicationContext(), "Utilizatorul nu este autentificat.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Firebase Authentication error.", Toast.LENGTH_SHORT).show();
 
         }
 

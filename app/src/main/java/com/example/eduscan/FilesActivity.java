@@ -257,9 +257,6 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
                 DatabaseConnection.getInstance().downloadFiles(FilesActivity.this, fileAdapter.getSelectedFiles(), new DatabaseConnection.DatabaseActionListener() {
                     @Override
                     public void onSuccess() {
-                        // Called when all files are successfully downloaded
-                        // Now you can open PdfRenderer to display the PDF
-                        // Obține calea către directorul public de descărcări
                         File downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                         File localFile = new File(downloadDirectory, fileAdapter.getSelectedFiles().get(0)+ ".pdf");
 
@@ -460,11 +457,9 @@ public class FilesActivity extends AppCompatActivity implements FileAdapter.Sele
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permisiunea a fost acordată
-            } else {
-                // Permisiunea a fost refuzată, ar trebui să informezi utilizatorul
-                Toast.makeText(this, "Permisiunea este necesară pentru a descărca și vizualiza fișiere.", Toast.LENGTH_SHORT).show();
+            if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                // Permisiunea a fost refuzată
+                Toast.makeText(this, "Permission is required to download and view files.", Toast.LENGTH_SHORT).show();
             }
         }
     }
